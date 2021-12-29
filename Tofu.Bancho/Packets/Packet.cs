@@ -2,7 +2,7 @@ using System.IO;
 using EeveeTools.Helpers;
 using Tofu.Bancho.Helpers.BanchoSerializer;
 
-using RequestType282 = Tofu.Bancho.Packets.Build282.RequestType;
+using RequestType282 = Tofu.Bancho.Packets.Build282.Enums.RequestType;
 
 namespace Tofu.Bancho.Packets {
     /// <summary>

@@ -11,6 +11,10 @@ namespace Tofu.Bancho.Clients {
         /// <summary>
         /// Whether the Login succeeded prior to Upgrading
         /// </summary>
-        public bool   LoginSuccessPending;
+        public bool LoginSuccessPending;
+        /// <summary>
+        /// osu! Presence Information
+        /// </summary>
+        public OsuPresence Presence;
     }
 }

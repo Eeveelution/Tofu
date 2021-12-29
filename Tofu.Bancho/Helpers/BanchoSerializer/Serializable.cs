@@ -24,6 +24,7 @@ namespace Tofu.Bancho.Helpers.BanchoSerializer {
 
             if(resetSeek)
                 readStream.Seek(0, SeekOrigin.Begin);
+
             using BanchoReader reader = new(readStream);
 
             foreach (FieldInfo fieldType in properties) {

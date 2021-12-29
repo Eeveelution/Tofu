@@ -47,7 +47,7 @@ namespace Tofu.Bancho.Clients {
                 //Set all the Currently known client information
                 this.ClientInformation = new ClientInformation {
                     Username = username,
-                    Id = 1,
+                    Id = this.Bancho.ClientManager.GetConnectedClientCount(),
                     LoginSuccessPending = true
                 };
             }

@@ -1,4 +1,5 @@
 using Tofu.Bancho.Helpers.BanchoSerializer;
+using Tofu.Bancho.Packets.Build282.Enums;
 
 namespace Tofu.Bancho.Packets.Build282 {
     /// <summary>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Tofu.Bancho.Clients;
+using Tofu.Bancho.Packets;
 
 namespace Tofu.Bancho.Managers {
     public class ClientManager {
@@ -12,7 +13,8 @@ namespace Tofu.Bancho.Managers {
         private readonly Dictionary<string, ClientOsu> _osuClientsByName;
         private readonly Dictionary<int, ClientOsu>    _osuClientsById;
 
-        private readonly List<Client>               _clients;
+        private readonly List<Client> _clients;
+        private readonly List<ClientOsu> _osuClients;
 
         private readonly object _clientListLock;
         /// <summary>
@@ -22,6 +24,7 @@ namespace Tofu.Bancho.Managers {
         public ClientManager(Bancho bancho) {
             this._bancho           = bancho;
             this._clients          = new List<Client>();
+            this._osuClients       = new List<ClientOsu>();
             this._clientsByName    = new Dictionary<string, Client>();
             this._clientsById      = new Dictionary<int, Client>();
             this._osuClientsByName = new Dictionary<string, ClientOsu>();
@@ -51,6 +54,7 @@ namespace Tofu.Bancho.Managers {
 
                 //If it's an osu! client add it to those respective lists
                 if (client is ClientOsu clientOsu) {
+                    this._osuClients.Add(clientOsu);
                     this._osuClientsByName.Add(client.ClientInformation.Username, clientOsu);
                     this._osuClientsById.Add(client.ClientInformation.Id, clientOsu);
                 }
@@ -101,6 +105,11 @@ namespace Tofu.Bancho.Managers {
             return foundClient;
         }
         /// <summary>
+        /// Gets the Amount of connected Clients
+        /// </summary>
+        /// <returns></returns>
+        public int GetConnectedClientCount() => this._clients.Count;
+        /// <summary>
         /// This mostly exists for <see cref="TofuWorker"/> so they can get a Client to process
         /// </summary>
         /// <param name="worker">TofuWorker</param>
@@ -134,6 +143,34 @@ namespace Tofu.Bancho.Managers {
             }
             catch {
                 return null;
+            }
+        }
+        /// <summary>
+        /// Broadcasts a osu! Packet to everyone
+        /// </summary>
+        /// <param name="packet">Packet to Broadcast</param>
+        public void BroadcastPacketOsu(Packet packet) {
+            for (int i = 0; i < this._osuClients.Count; i++) {
+                lock (this._clientListLock) {
+                    ClientOsu clientOsu = this._osuClients[i];
+
+                    clientOsu.QueuePacket(packet);
+                }
+            }
+        }
+        /// <summary>
+        /// Broadcasts a Packet to everyone but themselves
+        /// </summary>
+        /// <param name="packet">Packet to Broadcast</param>
+        /// <param name="self">Self</param>
+        public void BroadcastPacketOsuExceptSelf(Packet packet, ClientOsu self) {
+            for (int i = 0; i < this._osuClients.Count; i++) {
+                lock (this._clientListLock) {
+                    ClientOsu clientOsu = this._osuClients[i];
+
+                    if(clientOsu != self)
+                        clientOsu.QueuePacket(packet);
+                }
             }
         }
     }

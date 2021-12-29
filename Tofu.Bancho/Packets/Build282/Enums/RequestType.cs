@@ -1,4 +1,4 @@
-namespace Tofu.Bancho.Packets.Build282 {
+namespace Tofu.Bancho.Packets.Build282.Enums {
     public enum RequestType {
         OsuSendUserStatus,
         OsuSendIrcMessage,

@@ -38,5 +38,7 @@ namespace Tofu.Bancho.Clients {
             this.LastPingTime = DateTime.MinValue;
             this.LastPongTime = DateTime.MinValue;
         }
+
+        public void QueuePacket(Packet packet) => this.PacketQueue.Enqueue(packet);
     }
 }

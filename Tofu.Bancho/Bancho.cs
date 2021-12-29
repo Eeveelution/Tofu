@@ -6,6 +6,7 @@ using Tofu.Bancho.Clients;
 using Tofu.Bancho.Helpers;
 using Tofu.Bancho.Logging;
 using Tofu.Bancho.Managers;
+using Tofu.Bancho.Packets;
 
 namespace Tofu.Bancho {
     /// <summary>
