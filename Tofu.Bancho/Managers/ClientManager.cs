@@ -1,19 +1,67 @@
 using System;
 using System.Collections.Generic;
+using Tofu.Bancho.Clients;
 
-namespace Tofu.Bancho {
+namespace Tofu.Bancho.Managers {
     public class ClientManager {
-        private Bancho _bancho;
+        private readonly Bancho _bancho;
 
-        private Dictionary<string, Client> _clientsByName;
-        private Dictionary<long, Client>   _clientsById;
-        private List<Client>               _clients;
+        private readonly Dictionary<string, Client> _clientsByName;
+        private readonly Dictionary<long, Client>   _clientsById;
+
+        private readonly Dictionary<string, ClientOsu> _osuClientsByName;
+        private readonly Dictionary<long, ClientOsu>   _osuClientsById;
+
+        private readonly List<Client>               _clients;
+
+        private readonly object _clientListLock;
 
         public ClientManager(Bancho bancho) {
-            this._bancho        = bancho;
-            this._clients       = new List<Client>();
-            this._clientsByName = new Dictionary<string, Client>();
-            this._clientsById   = new Dictionary<long, Client>();
+            this._bancho           = bancho;
+            this._clients          = new List<Client>();
+            this._clientsByName    = new Dictionary<string, Client>();
+            this._clientsById      = new Dictionary<long, Client>();
+            this._osuClientsByName = new Dictionary<string, ClientOsu>();
+            this._osuClientsById   = new Dictionary<long, ClientOsu>();
+            this._clientListLock   = new object();
+        }
+
+        public bool RegisterClient(Client client) {
+            lock (this._clientListLock) {
+                Client existingClient;
+
+                existingClient = this.GetClientById(client.ClientInformation.Id);
+                existingClient?.Kill();
+
+                existingClient = this.GetClientByName(client.ClientInformation.Username);
+                existingClient?.Kill();
+
+                this._clients.Add(client);
+                this._clientsByName.Add(client.ClientInformation.Username, client);
+                this._clientsById.Add(client.ClientInformation.Id, client);
+
+                if (client is ClientOsu clientOsu) {
+                    this._osuClientsByName.Add(client.ClientInformation.Username, clientOsu);
+                    this._osuClientsById.Add(client.ClientInformation.Id, clientOsu);
+                }
+
+                client.RegistrationComplete();
+
+                return true;
+            }
+        }
+
+        public void RemoveClient(Client client) {
+            lock(this._clientListLock){
+                this._clients.Remove(client);
+                this._clientsByName.Remove(client.ClientInformation.Username);
+                this._clientsById.Remove(client.ClientInformation.Id);
+
+                if (client is ClientOsu) {
+                    this._osuClientsByName.Remove(client.ClientInformation.Username);
+                    this._osuClientsById.Remove(client.ClientInformation.Id);
+                }
+            }
         }
 
         public Client GetClientByName(string name) {
@@ -23,9 +71,9 @@ namespace Tofu.Bancho {
             return foundClient;
         }
 
-        public Client GetClientById(string name) {
+        public Client GetClientById(long id) {
             Client foundClient;
-            this._clientsByName.TryGetValue(name, out foundClient);
+            this._clientsById.TryGetValue(id, out foundClient);
 
             return foundClient;
         }

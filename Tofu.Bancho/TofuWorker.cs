@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using Tofu.Bancho.Clients;
 
 namespace Tofu.Bancho {
     public class TofuWorker {
@@ -12,8 +13,6 @@ namespace Tofu.Bancho {
 
         private Thread _workerThread;
         private bool   _continueWork = true;
-
-
 
         public TofuWorker(Bancho bancho, int id) {
             this._bancho = bancho;
@@ -38,8 +37,10 @@ namespace Tofu.Bancho {
                 Client client = this._bancho.ClientManager.GetProcessableClient(this);
 
                 if (client != null) {
-
+                    client.HandleClient();
                 }
+
+                Thread.Sleep(120);
             }
         }
     }

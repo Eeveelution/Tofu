@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Kettu;using Tofu.Bancho;
 
-namespace Tofu.Bancho {
-    class Program {
-        static void Main(string[] args) {
-            Console.WriteLine("Hello World!");
-        }
-    }
-}
+Logger.StartLogging();
+Logger.AddLogger(new ConsoleLogger());
+
+new Bancho("127.0.0.1", 13381).RunBancho();
+
+Logger.StopLogging();
