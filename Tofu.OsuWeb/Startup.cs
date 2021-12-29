@@ -12,7 +12,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 
-namespace Tofu.Web {
+namespace Tofu.OsuWeb {
     public class Startup {
         public Startup(IConfiguration configuration) {
             Configuration = configuration;
@@ -26,7 +26,7 @@ namespace Tofu.Web {
             services.AddSwaggerGen(c => {
                 c.SwaggerDoc("v1",
                              new OpenApiInfo {
-                                 Title = "Tofu.Web", Version = "v1"
+                                 Title = "Tofu.OsuWeb", Version = "v1"
                              });
             });
         }
@@ -36,7 +36,7 @@ namespace Tofu.Web {
             if (env.IsDevelopment()) {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tofu.Web v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Tofu.OsuWeb v1"));
             }
 
             app.UseHttpsRedirection();

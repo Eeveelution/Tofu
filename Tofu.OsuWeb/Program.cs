@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Tofu.Web {
+namespace Tofu.OsuWeb {
     public class Program {
         public static void Main(string[] args) {
             CreateHostBuilder(args)

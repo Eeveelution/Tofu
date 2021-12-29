@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tofu.Web", "Tofu.Web\Tofu.Web.csproj", "{54C005D9-D8DD-49CB-8688-53CBD608FAC3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tofu.OsuWeb", "Tofu.OsuWeb\Tofu.OsuWeb.csproj", "{54C005D9-D8DD-49CB-8688-53CBD608FAC3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tofu.Bancho", "Tofu.Bancho\Tofu.Bancho.csproj", "{EFEDC817-B89D-4B9B-9E98-5A0E8FF8DECF}"
 EndProject
