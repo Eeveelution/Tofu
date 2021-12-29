@@ -7,10 +7,10 @@ namespace Tofu.Bancho.Managers {
         private readonly Bancho _bancho;
 
         private readonly Dictionary<string, Client> _clientsByName;
-        private readonly Dictionary<long, Client>   _clientsById;
+        private readonly Dictionary<int, Client>    _clientsById;
 
         private readonly Dictionary<string, ClientOsu> _osuClientsByName;
-        private readonly Dictionary<long, ClientOsu>   _osuClientsById;
+        private readonly Dictionary<int, ClientOsu>    _osuClientsById;
 
         private readonly List<Client>               _clients;
 
@@ -20,9 +20,9 @@ namespace Tofu.Bancho.Managers {
             this._bancho           = bancho;
             this._clients          = new List<Client>();
             this._clientsByName    = new Dictionary<string, Client>();
-            this._clientsById      = new Dictionary<long, Client>();
+            this._clientsById      = new Dictionary<int, Client>();
             this._osuClientsByName = new Dictionary<string, ClientOsu>();
-            this._osuClientsById   = new Dictionary<long, ClientOsu>();
+            this._osuClientsById   = new Dictionary<int, ClientOsu>();
             this._clientListLock   = new object();
         }
 
@@ -31,10 +31,10 @@ namespace Tofu.Bancho.Managers {
                 Client existingClient;
 
                 existingClient = this.GetClientById(client.ClientInformation.Id);
-                existingClient?.Kill();
+                existingClient?.Kill("Duplicate Client.");
 
                 existingClient = this.GetClientByName(client.ClientInformation.Username);
-                existingClient?.Kill();
+                existingClient?.Kill("Duplicate Client.");
 
                 this._clients.Add(client);
                 this._clientsByName.Add(client.ClientInformation.Username, client);
@@ -71,7 +71,7 @@ namespace Tofu.Bancho.Managers {
             return foundClient;
         }
 
-        public Client GetClientById(long id) {
+        public Client GetClientById(int id) {
             Client foundClient;
             this._clientsById.TryGetValue(id, out foundClient);
 
@@ -80,26 +80,28 @@ namespace Tofu.Bancho.Managers {
 
         public Client GetProcessableClient(TofuWorker worker) {
             try {
-                int count = this._clients.Count;
+                lock (this._clientListLock) {
+                    int count = this._clients.Count;
 
-                if (count == 0)
-                    return null;
+                    if (count == 0)
+                        return null;
 
-                int range = (int) Math.Ceiling((float) count / this._bancho.GetTofuWorkerCount());
-                int start = range * worker.Id;
+                    int range = (int) Math.Ceiling((float) count / this._bancho.GetTofuWorkerCount());
+                    int start = range * worker.Id;
 
-                int index = Math.Min(count - 1, start + worker.LastProcessedIndex);
+                    int index = Math.Min(count - 1, start + worker.LastProcessedIndex);
 
-                if (index < start)
-                    return null;
+                    if (index < start)
+                        return null;
 
-                Client client = this._clients[index];
+                    Client client = this._clients[index];
 
-                worker.LastProcessedIndex = (worker.LastProcessedIndex + 1) % range;
+                    worker.LastProcessedIndex = (worker.LastProcessedIndex + 1) % range;
 
-                return client;
+                    return client;
+                }
             }
-            catch (Exception e) {
+            catch {
                 return null;
             }
         }

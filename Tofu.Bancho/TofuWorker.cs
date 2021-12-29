@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
+using Kettu;
 using Tofu.Bancho.Clients;
+using Tofu.Bancho.Logging;
 
 namespace Tofu.Bancho {
     public class TofuWorker {
@@ -40,7 +42,7 @@ namespace Tofu.Bancho {
                     client.HandleClient();
                 }
 
-                Thread.Sleep(120);
+                Thread.Sleep(20);
             }
         }
     }

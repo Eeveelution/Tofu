@@ -1,6 +1,7 @@
 namespace Tofu.Bancho.Clients {
     public struct ClientInformation {
-        public long   Id;
+        public int   Id;
         public string Username;
+        public bool   LoginSuccessPending;
     }
 }

@@ -55,6 +55,8 @@ namespace Tofu.Bancho {
             while (true) {
                 TcpClient newClient = this._banchoListener.AcceptTcpClient();
 
+                Logger.Log("Recieved TcpClient on Bancho", LoggerLevelInfo.Instance);
+
                 ThreadHelper.SpawnThread(() => {
                     UnauthenticatedClientOsu unauthenticatedClientOsu = new UnauthenticatedClientOsu(this, newClient);
 
