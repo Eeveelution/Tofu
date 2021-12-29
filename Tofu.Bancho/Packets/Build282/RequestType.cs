@@ -1,0 +1,28 @@
+namespace Tofu.Bancho.Packets.Build282 {
+    public enum RequestType {
+        OsuSendUserStatus,
+        OsuSendIrcMessage,
+        OsuExit,
+        OsuRequestStatusUpdate,
+        OsuPong,
+        BanchoLoginReply,
+        BanchoCommandError,
+        BanchoSendIrcMessage,
+        BanchoPing,
+        BanchoHandleIrcChangeUsername,
+        BanchoHandleIrcQuit,
+        BanchoHandleIrcJoin,
+        BanchoHandleOsuUpdate,
+        BanchoHandleOsuQuit,
+        BanchoSpectatorJoined,
+        BanchoSpectatorLeft,
+        BanchoSpectateFrames,
+        OsuStartSpectating,
+        OsuStopSpectating,
+        OsuSpectateFrames,
+        BanchoVersionUpdate,
+        OsuErrorReport,
+        OsuCantSpectate,
+        BanchoSpectatorCantSpectate,
+    }
+}
