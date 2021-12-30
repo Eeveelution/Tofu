@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using EeveeTools.Database;
 using Kettu;
 using Tofu.Bancho.Clients;
 using Tofu.Bancho.Helpers;
@@ -28,6 +29,11 @@ namespace Tofu.Bancho {
         public  ClientManager    ClientManager;
 
         /// <summary>
+        /// Database Context used for Connecting to Databases
+        /// </summary>
+        public DatabaseContext DatabaseContext;
+
+        /// <summary>
         /// How many workers to spawn
         /// </summary>
         private const int WorkerCount = 1;
@@ -37,7 +43,7 @@ namespace Tofu.Bancho {
         /// </summary>
         /// <param name="location">Where to start the Server</param>
         /// <param name="port">On what port (usually 13381)</param>
-        public Bancho(string location, int port) {
+        public Bancho(string location, int port, DatabaseContext context) {
             this._banchoListener = new TcpListener(IPAddress.Parse(location), port);
             this._tofuWorkers    = new List<TofuWorker>();
 

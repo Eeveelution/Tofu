@@ -9,6 +9,10 @@ namespace Tofu.Bancho.Clients {
         /// </summary>
         public string Username;
         /// <summary>
+        /// Timezone of the Client
+        /// </summary>
+        public int Timezone;
+        /// <summary>
         /// Whether the Login succeeded prior to Upgrading
         /// </summary>
         public bool LoginSuccessPending;

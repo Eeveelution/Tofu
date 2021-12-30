@@ -1,7 +1,10 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
+using EeveeTools.Database;
+using MySqlConnector;
 using Tofu.Bancho.Clients.OsuClients;
+using Tofu.Bancho.Packets.Build282;
 
 namespace Tofu.Bancho.Clients {
     /// <summary>
@@ -15,9 +18,7 @@ namespace Tofu.Bancho.Clients {
         /// <summary>
         /// Used for Handling everything client related, this gets called by TofuWorkers
         /// </summary>
-        public override void HandleClient() {
-
-        }
+        public override void HandleClient() {}
         /// <summary>
         /// Handles authentication
         /// </summary>
@@ -35,21 +36,48 @@ namespace Tofu.Bancho.Clients {
                 password = reader.ReadLine();
                 clientInfo = reader.ReadLine();
 
+                string[] split = clientInfo.Split('|');
+
                 //Determine the Version
-                string version = clientInfo.Split("|")[0];
+                string version = split[0];
+
+                this.ClientInformation = new ClientInformation {
+                    Username = username
+                };
 
                 switch (version) {
                     case "b282":
                         this._clientType = ClientType.Build282;
+
+                        try {
+                            this.ClientInformation.Timezone = int.Parse(split[1]);
+                        } catch {
+                            this.Kill("Malformed Login String.");
+                        }
+
                         break;
                 }
 
-                //Set all the Currently known client information
-                this.ClientInformation = new ClientInformation {
-                    Username = username,
-                    Id = this.Bancho.ClientManager.GetConnectedClientCount(),
-                    LoginSuccessPending = true
+                const string loginSql = "SELECT user_id, username, password FROM users WHERE username=@username";
+
+                MySqlParameter[] loginParams = new[] {
+                    new MySqlParameter("@username", username)
                 };
+
+                var databaseResults = MySqlDatabaseHandler.MySqlQuery(this.Bancho.DatabaseContext, loginSql, loginParams);
+                var result = databaseResults[0];
+
+                int userId = (int) result["user_id"];
+                string dbPassword = (string) result["password"];
+
+                this.ClientInformation.Id = userId;
+
+                //TODO: BCrypt
+                if (password != dbPassword) {
+                    new BanchoLoginResponse(-1).ToPacket().Send(this.ClientStream);
+
+                    return false;
+                }
             }
 
             return true;
