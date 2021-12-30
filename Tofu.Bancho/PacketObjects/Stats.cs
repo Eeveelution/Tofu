@@ -1,5 +1,5 @@
 namespace Tofu.Bancho.PacketObjects {
-    public class StatsUpdate {
+    public class Stats {
         public int         UserId;
         public string      Username;
         public long        RankedScore;

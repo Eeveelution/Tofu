@@ -5,14 +5,14 @@ using Tofu.Bancho.Clients.OsuClients;
 
 namespace Tofu.Bancho.Managers {
     public class ClientManager {
-        private readonly Dictionary<string, Client> _clientsByName;
-        private readonly Dictionary<int, Client>    _clientsById;
+        internal readonly Dictionary<string, Client> ClientsByName;
+        internal readonly Dictionary<int, Client>    ClientsById;
 
-        private readonly Dictionary<string, ClientOsu> _osuClientsByName;
-        private readonly Dictionary<int, ClientOsu>    _osuClientsById;
+        internal readonly Dictionary<string, ClientOsu> OsuClientsByName;
+        internal readonly Dictionary<int, ClientOsu>    OsuClientsById;
 
-        private readonly List<Client> _clients;
-        private readonly List<ClientOsu> _osuClients;
+        internal readonly List<Client> Clients;
+        internal readonly List<ClientOsu> OsuClients;
 
         private readonly object _clientListLock;
         /// <summary>
@@ -20,12 +20,12 @@ namespace Tofu.Bancho.Managers {
         /// </summary>
         /// <param name="bancho">Bancho this is running under</param>
         public ClientManager() {
-            this._clients          = new List<Client>();
-            this._osuClients       = new List<ClientOsu>();
-            this._clientsByName    = new Dictionary<string, Client>();
-            this._clientsById      = new Dictionary<int, Client>();
-            this._osuClientsByName = new Dictionary<string, ClientOsu>();
-            this._osuClientsById   = new Dictionary<int, ClientOsu>();
+            this.Clients          = new List<Client>();
+            this.OsuClients       = new List<ClientOsu>();
+            this.ClientsByName    = new Dictionary<string, Client>();
+            this.ClientsById      = new Dictionary<int, Client>();
+            this.OsuClientsByName = new Dictionary<string, ClientOsu>();
+            this.OsuClientsById   = new Dictionary<int, ClientOsu>();
             this._clientListLock   = new object();
         }
         /// <summary>
@@ -45,15 +45,15 @@ namespace Tofu.Bancho.Managers {
                 existingClient?.Kill("Duplicate Client.");
 
                 //Add it to all the lists
-                this._clients.Add(client);
-                this._clientsByName.Add(client.ClientInformation.Username, client);
-                this._clientsById.Add(client.ClientInformation.Id, client);
+                this.Clients.Add(client);
+                this.ClientsByName.Add(client.ClientInformation.Username, client);
+                this.ClientsById.Add(client.ClientInformation.Id, client);
 
                 //If it's an osu! client add it to those respective lists
                 if (client is ClientOsu clientOsu) {
-                    this._osuClients.Add(clientOsu);
-                    this._osuClientsByName.Add(client.ClientInformation.Username, clientOsu);
-                    this._osuClientsById.Add(client.ClientInformation.Id, clientOsu);
+                    this.OsuClients.Add(clientOsu);
+                    this.OsuClientsByName.Add(client.ClientInformation.Username, clientOsu);
+                    this.OsuClientsById.Add(client.ClientInformation.Id, clientOsu);
                 }
 
                 //Make client handle a complete registration
@@ -69,13 +69,13 @@ namespace Tofu.Bancho.Managers {
         /// <param name="client">Client to remove</param>
         public void RemoveClient(Client client) {
             lock(this._clientListLock){
-                this._clients.Remove(client);
-                this._clientsByName.Remove(client.ClientInformation.Username);
-                this._clientsById.Remove(client.ClientInformation.Id);
+                this.Clients.Remove(client);
+                this.ClientsByName.Remove(client.ClientInformation.Username);
+                this.ClientsById.Remove(client.ClientInformation.Id);
 
                 if (client is ClientOsu) {
-                    this._osuClientsByName.Remove(client.ClientInformation.Username);
-                    this._osuClientsById.Remove(client.ClientInformation.Id);
+                    this.OsuClientsByName.Remove(client.ClientInformation.Username);
+                    this.OsuClientsById.Remove(client.ClientInformation.Id);
                 }
             }
         }
@@ -86,7 +86,7 @@ namespace Tofu.Bancho.Managers {
         /// <returns>Client with that Name</returns>
         public Client GetClientByName(string name) {
             Client foundClient;
-            this._clientsByName.TryGetValue(name, out foundClient);
+            this.ClientsByName.TryGetValue(name, out foundClient);
 
             return foundClient;
         }
@@ -97,15 +97,10 @@ namespace Tofu.Bancho.Managers {
         /// <returns>Client with that User Id</returns>
         public Client GetClientById(int id) {
             Client foundClient;
-            this._clientsById.TryGetValue(id, out foundClient);
+            this.ClientsById.TryGetValue(id, out foundClient);
 
             return foundClient;
         }
-        /// <summary>
-        /// Gets the Amount of connected Clients
-        /// </summary>
-        /// <returns></returns>
-        public int GetConnectedClientCount() => this._clients.Count;
         /// <summary>
         /// This mostly exists for <see cref="TofuWorker"/> so they can get a Client to process
         /// </summary>
@@ -114,7 +109,7 @@ namespace Tofu.Bancho.Managers {
         public Client GetProcessableClient(TofuWorker worker) {
             try {
                 lock (this._clientListLock) {
-                    int count = this._clients.Count;
+                    int count = this.Clients.Count;
 
                     if (count == 0)
                         return null;
@@ -130,7 +125,7 @@ namespace Tofu.Bancho.Managers {
                     if (index < start)
                         return null;
 
-                    Client client = this._clients[index];
+                    Client client = this.Clients[index];
 
                     //Increase its last processed client, so that next time this worker comes around, it will pick the next client
                     worker.LastProcessedIndex = (worker.LastProcessedIndex + 1) % range;
@@ -147,9 +142,9 @@ namespace Tofu.Bancho.Managers {
         /// </summary>
         /// <param name="packet">Packet to Broadcast</param>
         public void BroadcastPacketOsu(Action<ClientOsu> packet) {
-            for (int i = 0; i < this._osuClients.Count; i++) {
+            for (int i = 0; i < this.OsuClients.Count; i++) {
                 lock (this._clientListLock) {
-                    ClientOsu clientOsu = this._osuClients[i];
+                    ClientOsu clientOsu = this.OsuClients[i];
 
                     packet.Invoke(clientOsu);
                 }
@@ -161,9 +156,9 @@ namespace Tofu.Bancho.Managers {
         /// <param name="packet">Packet to Broadcast</param>
         /// <param name="self">Self</param>
         public void BroadcastPacketOsuExceptSelf(Action<ClientOsu> packet, ClientOsu self) {
-            for (int i = 0; i < this._osuClients.Count; i++) {
+            for (int i = 0; i < this.OsuClients.Count; i++) {
                 lock (this._clientListLock) {
-                    ClientOsu clientOsu = this._osuClients[i];
+                    ClientOsu clientOsu = this.OsuClients[i];
 
                     if(clientOsu == self)
                         continue;

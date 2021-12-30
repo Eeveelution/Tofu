@@ -28,5 +28,35 @@ namespace Tofu.Bancho.Clients {
         /// osu! Presence Information
         /// </summary>
         public OsuPresence Presence;
+        /// <summary>
+        /// Current Playmode
+        /// </summary>
+        public byte CurrentPlayMode;
+
+        public Stats GetStats(byte mode) {
+            UserStats stats = mode switch {
+                0 => this.User.OsuStats,
+                1 => this.User.TaikoStats,
+                2 => this.User.CatchStats,
+                3 => this.User.ManiaStats,
+            };
+
+            return new Stats {
+                UserId      = (int) this.User.Id,
+                Username    = this.User.Username,
+                RankedScore = stats.RankedScore,
+                Accuracy    = stats.Accuracy,
+                Playcount   = (int) stats.Playcount,
+                TotalScore  = stats.TotalScore,
+                Presence = new OsuPresence {
+                    BeatmapChecksum = this.Presence.BeatmapChecksum,
+                    UserStatus      = this.Presence.UserStatus,
+                    StatusText      = this.Presence.StatusText,
+                    EnabledMods     = this.Presence.EnabledMods,
+                },
+                Timezone = (byte) this.Timezone,
+                Location = this.User.Location
+            };
+        }
     }
 }

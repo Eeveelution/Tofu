@@ -5,6 +5,9 @@ using EeveeTools.Database;
 using MySqlConnector;
 using Tofu.Bancho.DatabaseObjects;
 using Tofu.Bancho.Helpers;
+using Tofu.Bancho.PacketObjects;
+using Tofu.Bancho.PacketObjects.Enums;
+using Tofu.Bancho.Packets.Build282.Enums;
 
 namespace Tofu.Bancho.Clients.OsuClients {
     /// <summary>
@@ -24,14 +27,20 @@ namespace Tofu.Bancho.Clients.OsuClients {
         }
 
         /// <summary>
-        /// Used for Handling everything client related, this gets called by TofuWorkers
-        /// </summary>
-        public void HandleClient() {}
-        /// <summary>
         /// Handles authentication
         /// </summary>
         /// <returns></returns>
-        public bool PerformAuth() {
+        public void PerformAuth() {
+            this._clientInformation = new ClientInformation {
+                CurrentPlayMode = 0,
+                Presence = new OsuPresence {
+                    BeatmapChecksum = "",
+                    StatusText = "",
+                    EnabledMods = Mods.None,
+                    UserStatus = Status.Idle
+                }
+            };
+
             string username;
             string password;
             string clientInfo;
@@ -43,6 +52,11 @@ namespace Tofu.Bancho.Clients.OsuClients {
                 username = reader.ReadLine();
                 password = reader.ReadLine();
                 clientInfo = reader.ReadLine();
+
+                if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(clientInfo)) {
+                    this.Kill();
+                    return;
+                }
 
                 string[] split = clientInfo.Split('|');
 
@@ -57,36 +71,36 @@ namespace Tofu.Bancho.Clients.OsuClients {
                             this._clientInformation.Timezone = int.Parse(split[1]);
                         } catch {
                             this.Kill();
+                            return;
                         }
 
                         break;
                 }
 
-                const string loginSql = "SELECT * FROM users WHERE username=@username";
+               User databaseUser = User.FromDatabase(username);
 
-                MySqlParameter[] loginParams = new[] {
-                    new MySqlParameter("@username", username)
-                };
+               this._clientInformation.User = databaseUser;
 
-                var databaseResults = MySqlDatabaseHandler.MySqlQuery(Global.DatabaseContext, loginSql, loginParams);
+               if (databaseUser == null) {
+                   this._clientInformation.PendingLoginResult = LoginResult.AuthFailed;
+                   this._clientInformation.User = new User {
+                       Username = username, Id = -1
+                   };
+                   return;
+               }
 
-                if (databaseResults.Length == 0)
-                    return false;
-
-                var result = databaseResults[0];
-
-                User databaseUser = new User();
-                databaseUser.MapDatabaseResults(result);
-
-                this._clientInformation.User = databaseUser;
+               if (databaseUser.Password != password) {
+                   this._clientInformation.PendingLoginResult = LoginResult.AuthFailed;
+                   this._clientInformation.User = new User {
+                       Username = username, Id = -1
+                   };
+                   return;
+               }
             }
-
-            return true;
         }
         /// <summary>
         /// Kills the Client
         /// </summary>
-        /// <param name="reason">Possible reason</param>
         public void Kill() {
             this._client.Close();
             this._clientStream.Close();

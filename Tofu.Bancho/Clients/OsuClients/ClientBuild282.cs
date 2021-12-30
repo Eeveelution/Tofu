@@ -4,8 +4,10 @@ using System.Net.Sockets;
 using EeveeTools.Helpers;
 using Kettu;
 using Tofu.Bancho.Logging;
+using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.PacketObjects.Enums;
 using Tofu.Bancho.Packets;
+using Tofu.Bancho.Packets.Build282;
 using Tofu.Bancho.Packets.Build282.Enums;
 using Tofu.Bancho.Packets.Common;
 
@@ -74,11 +76,16 @@ namespace Tofu.Bancho.Clients.OsuClients {
 
                 //Handle Packets
                 switch (requestType) {
-                    case RequestType.OsuExit:
+                    case RequestType.OsuExit: {
                         this.Kill("Client exited.");
                         break;
-                    case RequestType.OsuRequestStatusUpdate:
+                    }
+                    case RequestType.OsuRequestStatusUpdate: {
+                        foreach (ClientOsu client in Global.Bancho.ClientManager.OsuClients) {
+                            this.HandleOsuUpdate(client.ClientInformation.GetStats(client.ClientInformation.CurrentPlayMode));
+                        }
                         break;
+                    }
                 }
             }
         }
@@ -131,15 +138,17 @@ namespace Tofu.Bancho.Clients.OsuClients {
                 case LoginResult.Banned:
                 case LoginResult.ServerFailure:
                     this.LoginResponse(-1);
-                    break;
+                    return;
                 case LoginResult.VersionMismatch:
                     this.LoginResponse(-2);
-                    break;
+                    return;
                 default:
                     this.LoginResponse(this.ClientInformation.Id);
+                    this.ClientInformation.User.FetchAllStats();
                     break;
             }
 
+            Global.Bancho.ClientManager.BroadcastPacketOsu(client => client.HandleOsuUpdate(this.ClientInformation.GetStats(this.ClientInformation.CurrentPlayMode)));
         }
 
         #region Packets
@@ -153,6 +162,11 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// Sends a BanchoPing
         /// </summary>
         public override void Ping() => this.QueuePacket(new BanchoPing());
+        /// <summary>
+        /// Sends a BanchoHandleOsuUpdate
+        /// </summary>
+        /// <param name="update">Update Object</param>
+        public override void HandleOsuUpdate(Stats update) => this.QueuePacket(BanchoHandleOsuUpdate.FromStatsUpdate(update));
 
         #endregion
 

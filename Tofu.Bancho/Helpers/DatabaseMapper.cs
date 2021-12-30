@@ -10,10 +10,15 @@ namespace Tofu.Bancho.Helpers {
             Dictionary<string, object> renamedDictionary = mappingDictionary.ToDictionary(keyValuePair => keyValuePair.Key.Replace("_", ""), keyValuePair => keyValuePair.Value);
 
             foreach (PropertyInfo property in properties) {
-                object value = renamedDictionary.GetValueOrDefault(property.Name.ToLower(), null);
+                try {
+                    object value = renamedDictionary.GetValueOrDefault(property.Name.ToLower(), null);
 
-                if(value != null)
-                    property.SetValue(objectToMap, value);
+                    if (value != null)
+                        property.SetValue(objectToMap, value);
+                }
+                catch {
+
+                }
             }
         }
     }

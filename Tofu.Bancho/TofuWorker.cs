@@ -58,16 +58,21 @@ namespace Tofu.Bancho {
         /// </summary>
         private void Work() {
             while (this._continueWork) {
-                //Get Client to process
-                Client client = Global.Bancho.ClientManager.GetProcessableClient(this);
-                this.LastClientHandleRequest = DateTime.Now;
+                try {
+                    //Get Client to process
+                    Client client = Global.Bancho.ClientManager.GetProcessableClient(this);
+                    this.LastClientHandleRequest = DateTime.Now;
 
-                //Handle it
-                client?.HandleClient();
+                    //Handle it
+                    client?.HandleClient();
 
-                //Sleep
-                //TODO: use peppys crazy algorithm to make sleeps as efficient as possible, to not sleep too long or too little
-                Thread.Sleep(20);
+                    //Sleep
+                    //TODO: use peppys crazy algorithm to make sleeps as efficient as possible, to not sleep too long or too little
+                    Thread.Sleep(20);
+                }
+                catch {
+
+                }
             }
         }
     }
