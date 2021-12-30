@@ -1,7 +1,7 @@
 using Tofu.Bancho.Helpers.BanchoSerializer;
 using Tofu.Bancho.Packets.Build282.Enums;
 
-namespace Tofu.Bancho.Packets.Build282 {
+namespace Tofu.Bancho.Packets.Common {
     /// <summary>
     /// Bancho Login response, used to tell the client whether it authenticated successfully or not
     /// Error User Ids:

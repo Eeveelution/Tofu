@@ -27,7 +27,7 @@ namespace Tofu.Bancho.DatabaseObjects {
 
         }
 
-        public (bool success, string error) Create(string username, string password, string email = "", bool passwordIsMd5 = false) {
+        public static (bool success, string error, User resultUser) Create(string username, string password, string email = "", bool passwordIsMd5 = false) {
             try {
                 //Check for duplicate username
                 const string duplicateUsernameCheck = "SELECT COUNT(*) AS 'count' FROM tofu.users WHERE users.username = @username";
@@ -39,7 +39,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                 long usernameCount = (long) DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, duplicateUsernameCheck, duplicateUsernameParams)["count"];
 
                 if (usernameCount != 0)
-                    return (false, "Username already exists!");
+                    return (false, "Username already exists!", null);
 
                 //Check for duplicate email/username
                 const string duplicateEmailCheck = "SELECT COUNT(*) AS 'count' FROM tofu.users WHERE users.email_adress = @email";
@@ -51,7 +51,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                 long emailCount = (long) DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, duplicateEmailCheck, duplicateEmailParams)["count"];
 
                 if (emailCount != 0)
-                    return (false, "This mail adress has already been registered!");
+                    return (false, "This mail adress has already been registered!", null);
 
                 if (!passwordIsMd5)
                     password = CryptoHelper.HashMd5(password);
@@ -79,14 +79,62 @@ namespace Tofu.Bancho.DatabaseObjects {
 
                 MySqlDatabaseHandler.MySqlNonQuery(Global.DatabaseContext, insertStatsStatsSql, insertStatsParams);
 
-                return (true, "Registered successfully!");
+                return (true, "Registered successfully!", FromDatabase(userId));
             }
             catch (Exception e) {
 #if DEBUG
-                return (false, e.ToString());
+                return (false, e.ToString(), null);
 #else
-                return (false, "A error occured internally during registration.");
+                return (false, "A error occured internally during registration.", null);
 #endif
+            }
+        }
+
+        public static User FromDatabase(long userId) {
+            try {
+                User user = new User();
+
+                const string userFetchSql = "SELECT * FROM tofu.users WHERE id=@userid";
+
+                MySqlParameter[] userFetchParams = new[] {
+                    new MySqlParameter("@userid", userId)
+                };
+
+                var result = DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, userFetchSql, userFetchParams);
+
+                if (result == null)
+                    return null;
+
+                user.MapDatabaseResults(result);
+
+                return user;
+            }
+            catch {
+                return null;
+            }
+        }
+
+        public static User FromDatabase(string username) {
+            try {
+                User user = new User();
+
+                const string userFetchSql = "SELECT * FROM tofu.users WHERE username=@username";
+
+                MySqlParameter[] userFetchParams = new[] {
+                    new MySqlParameter("@username", username)
+                };
+
+                var result = DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, userFetchSql, userFetchParams);
+
+                if (result == null)
+                    return null;
+
+                user.MapDatabaseResults(result);
+
+                return user;
+            }
+            catch {
+                return null;
             }
         }
 

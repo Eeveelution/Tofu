@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Tofu.Bancho.Clients;
-using Tofu.Bancho.Packets;
+using Tofu.Bancho.Clients.OsuClients;
 
 namespace Tofu.Bancho.Managers {
     public class ClientManager {
@@ -146,12 +146,12 @@ namespace Tofu.Bancho.Managers {
         /// Broadcasts a osu! Packet to everyone
         /// </summary>
         /// <param name="packet">Packet to Broadcast</param>
-        public void BroadcastPacketOsu(Packet packet) {
+        public void BroadcastPacketOsu(Action<ClientOsu> packet) {
             for (int i = 0; i < this._osuClients.Count; i++) {
                 lock (this._clientListLock) {
                     ClientOsu clientOsu = this._osuClients[i];
 
-                    clientOsu.QueuePacket(packet);
+                    packet.Invoke(clientOsu);
                 }
             }
         }
@@ -160,13 +160,15 @@ namespace Tofu.Bancho.Managers {
         /// </summary>
         /// <param name="packet">Packet to Broadcast</param>
         /// <param name="self">Self</param>
-        public void BroadcastPacketOsuExceptSelf(Packet packet, ClientOsu self) {
+        public void BroadcastPacketOsuExceptSelf(Action<ClientOsu> packet, ClientOsu self) {
             for (int i = 0; i < this._osuClients.Count; i++) {
                 lock (this._clientListLock) {
                     ClientOsu clientOsu = this._osuClients[i];
 
-                    if(clientOsu != self)
-                        clientOsu.QueuePacket(packet);
+                    if(clientOsu == self)
+                        continue;
+
+                    packet.Invoke(clientOsu);
                 }
             }
         }

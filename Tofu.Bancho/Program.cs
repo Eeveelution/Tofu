@@ -1,5 +1,5 @@
 ﻿using EeveeTools.Database;
-using Kettu;using Tofu.Bancho;using Tofu.Bancho.DatabaseObjects;
+using Kettu;using Tofu.Bancho;
 
 Logger.StartLogging();
 Logger.AddLogger(new ConsoleLogger());
