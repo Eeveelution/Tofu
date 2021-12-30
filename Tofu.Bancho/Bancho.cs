@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using EeveeTools.Database;
 using Kettu;
 using Tofu.Bancho.Clients;
+using Tofu.Bancho.DatabaseObjects;
 using Tofu.Bancho.Helpers;
 using Tofu.Bancho.Logging;
 using Tofu.Bancho.Managers;
@@ -47,7 +48,8 @@ namespace Tofu.Bancho {
             this._banchoListener = new TcpListener(IPAddress.Parse(location), port);
             this._tofuWorkers    = new List<TofuWorker>();
 
-            this.ClientManager = new ClientManager(this);
+            this.ClientManager   = new ClientManager(this);
+            this.DatabaseContext = context;
 
             //Initialize Workers
             for (int i = 0; i != WorkerCount; i++) {

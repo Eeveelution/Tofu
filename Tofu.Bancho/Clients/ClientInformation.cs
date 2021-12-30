@@ -1,13 +1,19 @@
+using Tofu.Bancho.DatabaseObjects;
+
 namespace Tofu.Bancho.Clients {
     public struct ClientInformation {
         /// <summary>
+        /// Everything known about the User
+        /// </summary>
+        public User User;
+        /// <summary>
         /// User Id of the CLient
         /// </summary>
-        public int Id;
+        public int Id => (int) User.Id;
         /// <summary>
         /// Username of the Client
         /// </summary>
-        public string Username;
+        public string Username => User.Username;
         /// <summary>
         /// Timezone of the Client
         /// </summary>

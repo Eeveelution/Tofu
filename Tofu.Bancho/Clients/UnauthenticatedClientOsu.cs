@@ -4,6 +4,8 @@ using System.Net.Sockets;
 using EeveeTools.Database;
 using MySqlConnector;
 using Tofu.Bancho.Clients.OsuClients;
+using Tofu.Bancho.DatabaseObjects;
+using Tofu.Bancho.Helpers;
 using Tofu.Bancho.Packets.Build282;
 
 namespace Tofu.Bancho.Clients {
@@ -41,10 +43,6 @@ namespace Tofu.Bancho.Clients {
                 //Determine the Version
                 string version = split[0];
 
-                this.ClientInformation = new ClientInformation {
-                    Username = username
-                };
-
                 switch (version) {
                     case "b282":
                         this._clientType = ClientType.Build282;
@@ -58,7 +56,7 @@ namespace Tofu.Bancho.Clients {
                         break;
                 }
 
-                const string loginSql = "SELECT user_id, username, password FROM users WHERE username=@username";
+                const string loginSql = "SELECT * FROM users WHERE username=@username";
 
                 MySqlParameter[] loginParams = new[] {
                     new MySqlParameter("@username", username)
@@ -67,17 +65,10 @@ namespace Tofu.Bancho.Clients {
                 var databaseResults = MySqlDatabaseHandler.MySqlQuery(this.Bancho.DatabaseContext, loginSql, loginParams);
                 var result = databaseResults[0];
 
-                int userId = (int) result["user_id"];
-                string dbPassword = (string) result["password"];
+                User databaseUser = new User(this.Bancho);
+                databaseUser.MapDatabaseResults(result);
 
-                this.ClientInformation.Id = userId;
-
-                //TODO: BCrypt
-                if (password != dbPassword) {
-                    new BanchoLoginResponse(-1).ToPacket().Send(this.ClientStream);
-
-                    return false;
-                }
+                this.ClientInformation.User = databaseUser;
             }
 
             return true;
