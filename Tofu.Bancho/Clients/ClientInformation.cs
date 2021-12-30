@@ -1,4 +1,6 @@
 using Tofu.Bancho.DatabaseObjects;
+using Tofu.Bancho.PacketObjects;
+using Tofu.Bancho.PacketObjects.Enums;
 
 namespace Tofu.Bancho.Clients {
     public struct ClientInformation {
@@ -21,7 +23,7 @@ namespace Tofu.Bancho.Clients {
         /// <summary>
         /// Whether the Login succeeded prior to Upgrading
         /// </summary>
-        public bool LoginSuccessPending;
+        public LoginResult PendingLoginResult;
         /// <summary>
         /// osu! Presence Information
         /// </summary>

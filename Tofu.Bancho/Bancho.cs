@@ -1,14 +1,11 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using EeveeTools.Database;
 using Kettu;
-using Tofu.Bancho.Clients;
-using Tofu.Bancho.DatabaseObjects;
+using Tofu.Bancho.Clients.OsuClients;
 using Tofu.Bancho.Helpers;
 using Tofu.Bancho.Logging;
 using Tofu.Bancho.Managers;
-using Tofu.Bancho.Packets;
 
 namespace Tofu.Bancho {
     /// <summary>
@@ -100,15 +97,15 @@ namespace Tofu.Bancho {
                     //This is because we don't currently know what sort of osu! client it is,
                     //it could be b281, b394a, whatever, since we cant tell until we get the login, this handles just the login information
                     //and then later we can upgrade the connection
-                    UnauthenticatedClientOsu unauthenticatedClientOsu = new UnauthenticatedClientOsu(this, newClient);
+                    UnknownClientOsu unknownClientOsu = new UnknownClientOsu(newClient);
 
                     //Authenticate
-                    if (unauthenticatedClientOsu.Authenticate()) {
-                        //Upgrade the Connection
-                        ClientOsu clientOsu = unauthenticatedClientOsu.ToClientOsu();
+                    unknownClientOsu.PerformAuth();
 
-                        this.ClientManager.RegisterClient(clientOsu);
-                    } else unauthenticatedClientOsu.Kill("Failed to authenticate.");
+                    //Upgrade the Connection
+                    ClientOsu clientOsu = unknownClientOsu.ToClientOsu();
+
+                    this.ClientManager.RegisterClient(clientOsu);
                 });
             }
         }

@@ -7,10 +7,6 @@ namespace Tofu.Bancho.Clients {
     /// </summary>
     public abstract class Client {
         /// <summary>
-        /// The Bancho it's connected to
-        /// </summary>
-        protected Bancho        Bancho;
-        /// <summary>
         /// It's TCP Socket
         /// </summary>
         protected TcpClient     TcpClient;
@@ -33,11 +29,10 @@ namespace Tofu.Bancho.Clients {
         /// </summary>
         /// <param name="bancho">Bancho</param>
         /// <param name="client">TCP Socket</param>
-        public Client(Bancho bancho, TcpClient client) {
+        public Client(TcpClient client) {
             this.TcpClient    = client;
             this.ClientStream = client.GetStream();
             this.StreamWriter = new BinaryWriter(this.ClientStream);
-            this.Bancho       = bancho;
         }
         /// <summary>
         /// Used for Handling everything client related, this gets called by TofuWorkers
@@ -47,7 +42,7 @@ namespace Tofu.Bancho.Clients {
         /// Used for Authenticating the Client
         /// </summary>
         /// <returns>Authentication success</returns>
-        public virtual bool Authenticate() { return true; }
+        public virtual bool PerformAuth() { return true; }
         /// <summary>
         /// Used for Cleaning up and killing the client
         /// </summary>

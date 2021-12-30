@@ -4,19 +4,19 @@ using System.Net.Sockets;
 using EeveeTools.Helpers;
 using Kettu;
 using Tofu.Bancho.Logging;
+using Tofu.Bancho.PacketObjects.Enums;
 using Tofu.Bancho.Packets;
-using Tofu.Bancho.Packets.Build282;
 using Tofu.Bancho.Packets.Build282.Enums;
+using Tofu.Bancho.Packets.Common;
 
 namespace Tofu.Bancho.Clients.OsuClients {
     public class ClientBuild282 : ClientOsu {
         /// <summary>
         /// Creates a b282 osu! Client
         /// </summary>
-        /// <param name="bancho">Bancho it's connected to</param>
         /// <param name="client">The TCP Socket it's using</param>
         /// <param name="information">The currently known information about the client</param>
-        public ClientBuild282(Bancho bancho, TcpClient client, ClientInformation information) : base(bancho, client) {
+        public ClientBuild282(TcpClient client, ClientInformation information) : base(client) {
             this.ClientInformation = information;
         }
         /// <summary>
@@ -78,22 +78,6 @@ namespace Tofu.Bancho.Clients.OsuClients {
                         this.Kill("Client exited.");
                         break;
                     case RequestType.OsuRequestStatusUpdate:
-                        this.QueuePacket(new BanchoHandleOsuUpdate() {
-                            UserId          = this.ClientInformation.Id,
-                            Username        = this.ClientInformation.Username,
-                            RankedScore     = 0,
-                            Accuracy        = 1,
-                            Playcount       = 0,
-                            TotalScore      = 0,
-                            Rank            = 1,
-                            AvatarFilename  = this.ClientInformation.Username,
-                            UserStatus      = Status.Idle,
-                            StatusText      = "Chilling",
-                            BeatmapChecksum = "",
-                            Mods            = Mods.None,
-                            Timezone        = 24,
-                            Location        = "osu!"
-                        });
                         break;
                 }
             }
@@ -119,13 +103,11 @@ namespace Tofu.Bancho.Clients.OsuClients {
 
                 //If we've exceeded 10 seconds without sending anything, send a ping
                 if (this.LastPingTime + PingTimeout <= DateTime.Now) {
-                    this.SendPing();
+                    this.Ping();
                     this.LastPingTime = DateTime.Now;
                 }
             }
-            catch {
-
-            }
+            catch { /* */ }
         }
 
         /// <summary>
@@ -135,7 +117,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
         public override void Kill(string reason) {
             Logger.Log($"[b282] <{this.ClientInformation.Username}@{this.ClientInformation.Id}> Killed for: {reason}", LoggerLevelInfo.Instance);
 
-            this.Bancho.ClientManager.RemoveClient(this);
+            Global.Bancho.ClientManager.RemoveClient(this);
         }
 
         /// <summary>
@@ -143,25 +125,21 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// </summary>
         public override void RegistrationComplete() {
             //If the Login was successful while in Unauthenticated
-            if (this.ClientInformation.LoginSuccessPending)
-                this.SendLoginResponse(this.ClientInformation.Id);
+            switch (this.ClientInformation.PendingLoginResult) {
+                case LoginResult.AuthFailed:
+                case LoginResult.Unauthorized:
+                case LoginResult.Banned:
+                case LoginResult.ServerFailure:
+                    this.LoginResponse(-1);
+                    break;
+                case LoginResult.VersionMismatch:
+                    this.LoginResponse(-2);
+                    break;
+                default:
+                    this.LoginResponse(this.ClientInformation.Id);
+                    break;
+            }
 
-            this.Bancho.ClientManager.BroadcastPacketOsu(new BanchoHandleOsuUpdate() {
-                UserId          = this.ClientInformation.Id,
-                Username        = this.ClientInformation.Username,
-                RankedScore     = 0,
-                Accuracy        = 1,
-                Playcount       = 0,
-                TotalScore      = 0,
-                Rank            = 1,
-                AvatarFilename  = this.ClientInformation.Username,
-                UserStatus      = Status.Idle,
-                StatusText      = "Chilling",
-                BeatmapChecksum = "",
-                Mods = Mods.None,
-                Timezone = 24,
-                Location = "osu!"
-            });
         }
 
         #region Packets
@@ -170,11 +148,11 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// Sends a BanchoLoginResponse
         /// </summary>
         /// <param name="userId">User ID to send</param>
-        public void SendLoginResponse(int userId) => this.QueuePacket(new BanchoLoginResponse(userId));
+        public override void LoginResponse(int userId) => this.QueuePacket(new BanchoLoginResponse(userId));
         /// <summary>
         /// Sends a BanchoPing
         /// </summary>
-        public void SendPing() => this.QueuePacket(new BanchoPing());
+        public override void Ping() => this.QueuePacket(new BanchoPing());
 
         #endregion
 
