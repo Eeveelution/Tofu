@@ -7,11 +7,6 @@ using Tofu.Bancho.Logging;
 namespace Tofu.Bancho {
     public class TofuWorker {
         /// <summary>
-        /// Bancho it's working for
-        /// </summary>
-        private Bancho _bancho;
-
-        /// <summary>
         /// It's ID
         /// </summary>
         public int Id { get; }
@@ -39,9 +34,7 @@ namespace Tofu.Bancho {
         /// </summary>
         /// <param name="bancho">Bancho it's working for</param>
         /// <param name="id">It's ID</param>
-        public TofuWorker(Bancho bancho, int id) {
-            this._bancho = bancho;
-
+        public TofuWorker(int id) {
             this.Id                      = id;
             this.LastClientHandleRequest = DateTime.MinValue;
 
@@ -68,7 +61,7 @@ namespace Tofu.Bancho {
         private void Work() {
             while (this._continueWork) {
                 //Get Client to process
-                Client client = this._bancho.ClientManager.GetProcessableClient(this);
+                Client client = Global.Bancho.ClientManager.GetProcessableClient(this);
                 this.LastClientHandleRequest = DateTime.Now;
 
                 //Handle it

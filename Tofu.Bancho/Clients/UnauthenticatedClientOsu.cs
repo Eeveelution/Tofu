@@ -62,10 +62,10 @@ namespace Tofu.Bancho.Clients {
                     new MySqlParameter("@username", username)
                 };
 
-                var databaseResults = MySqlDatabaseHandler.MySqlQuery(this.Bancho.DatabaseContext, loginSql, loginParams);
+                var databaseResults = MySqlDatabaseHandler.MySqlQuery(Global.DatabaseContext, loginSql, loginParams);
                 var result = databaseResults[0];
 
-                User databaseUser = new User(this.Bancho);
+                User databaseUser = new User();
                 databaseUser.MapDatabaseResults(result);
 
                 this.ClientInformation.User = databaseUser;

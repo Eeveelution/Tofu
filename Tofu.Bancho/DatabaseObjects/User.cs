@@ -6,8 +6,6 @@ using Tofu.Bancho.Helpers;
 
 namespace Tofu.Bancho.DatabaseObjects {
     public class User {
-        private Bancho _bancho;
-
         public long     Id { get; set; }
         public string   Username { get; set; }
         public string   Password { get; set; }
@@ -25,10 +23,6 @@ namespace Tofu.Bancho.DatabaseObjects {
         public UserStats CatchStats;
         public UserStats ManiaStats;
 
-        public User(Bancho bancho) {
-            this._bancho = bancho;
-        }
-
         public User() {
 
         }
@@ -42,7 +36,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@username", username)
                 };
 
-                long usernameCount = (long) DatabaseHelper.MySqlQueryOne(this._bancho.DatabaseContext, duplicateUsernameCheck, duplicateUsernameParams)["count"];
+                long usernameCount = (long) DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, duplicateUsernameCheck, duplicateUsernameParams)["count"];
 
                 if (usernameCount != 0)
                     return (false, "Username already exists!");
@@ -54,7 +48,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@email", email)
                 };
 
-                long emailCount = (long) DatabaseHelper.MySqlQueryOne(this._bancho.DatabaseContext, duplicateEmailCheck, duplicateEmailParams)["count"];
+                long emailCount = (long) DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, duplicateEmailCheck, duplicateEmailParams)["count"];
 
                 if (emailCount != 0)
                     return (false, "This mail adress has already been registered!");
@@ -70,12 +64,12 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@username", username), new MySqlParameter("@password", password), new MySqlParameter("@privileges", privileges), new MySqlParameter("@email", email), new MySqlParameter("@userpage", ""),
                 };
 
-                MySqlDatabaseHandler.MySqlNonQuery(this._bancho.DatabaseContext, insertUserSql, insertUserParams);
+                MySqlDatabaseHandler.MySqlNonQuery(Global.DatabaseContext, insertUserSql, insertUserParams);
 
                 const string getUserIdSql = "SELECT users.id FROM tofu.users WHERE users.username = @username";
 
                 //We can just reuse the params from earlier, no need to create em again
-                long userId = (long) DatabaseHelper.MySqlQueryOne(this._bancho.DatabaseContext, getUserIdSql, duplicateUsernameParams)["id"];
+                long userId = (long) DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, getUserIdSql, duplicateUsernameParams)["id"];
 
                 const string insertStatsStatsSql = "INSERT INTO tofu.stats (user_id, mode) VALUES (@userid, 0), (@userid, 1), (@userid, 2), (@userid, 3)";
 
@@ -83,7 +77,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@userid", userId)
                 };
 
-                MySqlDatabaseHandler.MySqlNonQuery(this._bancho.DatabaseContext, insertStatsStatsSql, insertStatsParams);
+                MySqlDatabaseHandler.MySqlNonQuery(Global.DatabaseContext, insertStatsStatsSql, insertStatsParams);
 
                 return (true, "Registered successfully!");
             }
@@ -111,7 +105,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                 new MySqlParameter("@mode", mode)
             };
 
-            var fetchResults = MySqlDatabaseHandler.MySqlQuery(this._bancho.DatabaseContext, fetchSql, fetchParams);
+            var fetchResults = MySqlDatabaseHandler.MySqlQuery(Global.DatabaseContext, fetchSql, fetchParams);
 
             UserStats stats = new UserStats();
             stats.MapDatabaseResults(fetchResults[0]);

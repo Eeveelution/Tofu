@@ -5,8 +5,6 @@ using Tofu.Bancho.Packets;
 
 namespace Tofu.Bancho.Managers {
     public class ClientManager {
-        private readonly Bancho _bancho;
-
         private readonly Dictionary<string, Client> _clientsByName;
         private readonly Dictionary<int, Client>    _clientsById;
 
@@ -21,8 +19,7 @@ namespace Tofu.Bancho.Managers {
         /// Creates a ClientManager instance
         /// </summary>
         /// <param name="bancho">Bancho this is running under</param>
-        public ClientManager(Bancho bancho) {
-            this._bancho           = bancho;
+        public ClientManager() {
             this._clients          = new List<Client>();
             this._osuClients       = new List<ClientOsu>();
             this._clientsByName    = new Dictionary<string, Client>();
@@ -123,7 +120,7 @@ namespace Tofu.Bancho.Managers {
                         return null;
 
                     //Work out what range of clients each worker should process
-                    int range = (int) Math.Ceiling((float) count / this._bancho.GetTofuWorkerCount());
+                    int range = (int) Math.Ceiling((float) count / Global.Bancho.GetTofuWorkerCount());
                     //Determine it's start
                     int start = range * worker.Id;
 

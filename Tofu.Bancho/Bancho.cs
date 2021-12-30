@@ -30,29 +30,23 @@ namespace Tofu.Bancho {
         public  ClientManager    ClientManager;
 
         /// <summary>
-        /// Database Context used for Connecting to Databases
-        /// </summary>
-        public DatabaseContext DatabaseContext;
-
-        /// <summary>
         /// How many workers to spawn
         /// </summary>
-        private const int WorkerCount = 1;
+        private const int WORKER_COUNT = 1;
 
         /// <summary>
         /// Creates a Bancho Server
         /// </summary>
         /// <param name="location">Where to start the Server</param>
         /// <param name="port">On what port (usually 13381)</param>
-        public Bancho(string location, int port, DatabaseContext context) {
+        public Bancho(string location, int port) {
             this._banchoListener = new TcpListener(IPAddress.Parse(location), port);
             this._tofuWorkers    = new List<TofuWorker>();
 
-            this.ClientManager   = new ClientManager(this);
-            this.DatabaseContext = context;
+            this.ClientManager   = new ClientManager();
 
             //Initialize Workers
-            for (int i = 0; i != WorkerCount; i++) {
+            for (int i = 0; i != WORKER_COUNT; i++) {
                 this.AddWorker();
             }
         }
@@ -67,7 +61,7 @@ namespace Tofu.Bancho {
         /// Creates and adds a worker
         /// </summary>
         public void AddWorker() {
-            TofuWorker worker = new TofuWorker(this, this._tofuWorkers.Count);
+            TofuWorker worker = new TofuWorker(this._tofuWorkers.Count);
             worker.Start();
 
             this._tofuWorkers.Add(worker);
