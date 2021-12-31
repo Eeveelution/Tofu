@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
+using SystemFile = System.IO.File;
+
 namespace Tofu.OsuWeb.Controllers {
     public class AvatarController : Controller {
         [HttpGet]
@@ -19,13 +21,13 @@ namespace Tofu.OsuWeb.Controllers {
             string avatarLocationJpg = $"avatars/{avatar}.jpg";
 
             if (System.IO.File.Exists(avatarLocationJpg)) {
-                avatarFile = await System.IO.File.ReadAllBytesAsync(avatarLocationJpg);
+                avatarFile = await SystemFile.ReadAllBytesAsync(avatarLocationJpg);
 
                 return File(avatarFile, "image/jpeg");
             }
 
             if (System.IO.File.Exists(avatarLocationPng)) {
-                avatarFile = await System.IO.File.ReadAllBytesAsync(avatarLocationPng);
+                avatarFile = await SystemFile.ReadAllBytesAsync(avatarLocationPng);
 
                 return File(avatarFile, "image/png");
             }
