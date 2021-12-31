@@ -61,6 +61,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
         public abstract void HandleOsuUpdate(ClientOsu clientOsu);
         public abstract void SendIrcMessage(Message message);
         public abstract void SendIrcMessage(string message);
+        public abstract void HandleOsuQuit(ClientOsu clientOsu);
 
         #endregion
 

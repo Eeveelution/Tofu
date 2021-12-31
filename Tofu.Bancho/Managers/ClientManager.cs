@@ -73,9 +73,10 @@ namespace Tofu.Bancho.Managers {
                 this.ClientsByName.Remove(client.Username);
                 this.ClientsById.Remove(client.Id);
 
-                if (client is ClientOsu) {
+                if (client is ClientOsu clientOsu) {
                     this.OsuClientsByName.Remove(client.Username);
                     this.OsuClientsById.Remove(client.Id);
+                    this.OsuClients.Remove(clientOsu);
                 }
             }
         }

@@ -85,6 +85,8 @@ namespace Tofu.Bancho.Clients.OsuClients {
                     //Handle Packets
                     switch (requestType) {
                         case RequestType.OsuExit: {
+                            Global.Bancho.ClientManager.BroadcastPacketOsu(clientOsu => clientOsu.HandleOsuQuit(this));
+
                             this.Kill("Client exited.");
                             break;
                         }
@@ -191,6 +193,11 @@ namespace Tofu.Bancho.Clients.OsuClients {
             Content = message,
             Sender = "TofuBot",
         }));
+        /// <summary>
+        /// Sends a BanchoHandleOsuQuit
+        /// </summary>
+        /// <param name="clientOsu">ClientOsu that quit</param>
+        public override void HandleOsuQuit(ClientOsu clientOsu) => this.QueuePacket(BanchoHandleOsuQuit.Create(clientOsu));
 
         #endregion
 
