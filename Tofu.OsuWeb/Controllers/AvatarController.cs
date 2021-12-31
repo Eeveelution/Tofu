@@ -6,6 +6,9 @@ namespace Tofu.OsuWeb.Controllers {
         [HttpGet]
         [Route("/forum/download.php")]
         public async Task<ActionResult> Index([FromQuery] string avatar) {
+            if (string.IsNullOrEmpty(avatar))
+                return this.BadRequest("No Avatar specified.");
+
             //Path traversal
             if (avatar.Contains(".") || avatar.Contains("/") || avatar.Contains("\\"))
                 return this.BadRequest("Sincerly, fuck off.");

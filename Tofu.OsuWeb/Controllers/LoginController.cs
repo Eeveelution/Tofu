@@ -7,6 +7,9 @@ namespace Tofu.OsuWeb.Controllers {
         [HttpGet]
         [Route("/web/osu-login.php")]
         public async Task<ActionResult> LoginGet([FromQuery] string username, [FromQuery] string password) {
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                return this.BadRequest("0");
+
             User user = await Bancho.DatabaseObjects.User.FromDatabaseAsync(username);
 
             if (user == null)
