@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Tofu.Bancho.Helpers {
+namespace Tofu.Common.Helpers {
     public static class DatabaseMapper {
         public static void MapDatabaseResults<pType>(this pType objectToMap, IReadOnlyDictionary<string, object> mappingDictionary) where pType : class, new() {
             PropertyInfo[] properties = typeof(pType).GetProperties();

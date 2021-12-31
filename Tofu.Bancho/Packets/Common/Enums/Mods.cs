@@ -1,4 +1,4 @@
-namespace Tofu.Bancho.Packets.Build282.Enums {
+namespace Tofu.Bancho.Packets.Common.Enums {
     public enum Mods {
         None        = 0,
         NoFail      = 1,

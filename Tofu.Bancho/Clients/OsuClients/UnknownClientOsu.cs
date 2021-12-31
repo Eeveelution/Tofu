@@ -1,11 +1,10 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
-using Tofu.Bancho.DatabaseObjects;
-using Tofu.Bancho.PacketObjects;
-using Tofu.Bancho.PacketObjects.Enums;
 using Tofu.Bancho.Packets.Build282.Enums;
 using Tofu.Bancho.Packets.Common;
+using Tofu.Bancho.Packets.Common.Enums;
+using Tofu.Common.DatabaseObjects;
 
 namespace Tofu.Bancho.Clients.OsuClients {
     /// <summary>

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using EeveeTools.Database;
 using MySqlConnector;
 
-namespace Tofu.Bancho.Helpers {
+namespace Tofu.Common.Helpers {
     public static class DatabaseHelper {
         public static IReadOnlyDictionary<string, object> MySqlQueryOne(DatabaseContext ctx, string query, MySqlParameter[] parameters = null) {
             try {

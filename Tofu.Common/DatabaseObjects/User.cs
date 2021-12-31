@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using EeveeTools.Database;
 using EeveeTools.Helpers;
 using MySqlConnector;
-using Tofu.Bancho.Helpers;
-using Tofu.Common;
+using Tofu.Common.Helpers;
 
-namespace Tofu.Bancho.DatabaseObjects {
+namespace Tofu.Common.DatabaseObjects {
     public class User {
         public long     Id { get; set; }
         public string   Username { get; set; }

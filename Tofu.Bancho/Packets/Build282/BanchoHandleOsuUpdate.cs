@@ -1,9 +1,8 @@
 using Tofu.Bancho.Clients.OsuClients;
-using Tofu.Bancho.DatabaseObjects;
 using Tofu.Bancho.Helpers.BanchoSerializer;
-using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.Packets.Build282.Enums;
 using Tofu.Bancho.Packets.Common.Enums;
+using Tofu.Common.DatabaseObjects;
 
 namespace Tofu.Bancho.Packets.Build282 {
     public class BanchoHandleOsuUpdate : Serializable {

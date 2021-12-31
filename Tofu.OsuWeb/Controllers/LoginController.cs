@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Tofu.Bancho.DatabaseObjects;
+using Tofu.Common.DatabaseObjects;
 
 namespace Tofu.OsuWeb.Controllers {
     public class LoginController : Controller {
@@ -10,7 +10,7 @@ namespace Tofu.OsuWeb.Controllers {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
                 return this.BadRequest("0");
 
-            User user = await Bancho.DatabaseObjects.User.FromDatabaseAsync(username);
+            User user = await Common.DatabaseObjects.User.FromDatabaseAsync(username);
 
             if (user == null)
                 return this.Ok("0");

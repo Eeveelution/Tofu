@@ -1,4 +1,4 @@
-namespace Tofu.Bancho.DatabaseObjects {
+namespace Tofu.Common.DatabaseObjects {
     public class UserStats {
         public long StatId { get; set; }
         public long UserId { get; set; }

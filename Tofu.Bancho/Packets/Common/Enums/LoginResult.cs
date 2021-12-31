@@ -1,4 +1,4 @@
-namespace Tofu.Bancho.PacketObjects.Enums {
+namespace Tofu.Bancho.Packets.Common.Enums {
     public enum LoginResult {
         AuthFailed      = -1,
         VersionMismatch = -2,

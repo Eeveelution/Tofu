@@ -1,8 +1,6 @@
 using System.IO;
 using System.Net.Sockets;
-using Tofu.Bancho.DatabaseObjects;
-using Tofu.Bancho.PacketObjects;
-using Tofu.Bancho.PacketObjects.Enums;
+using Tofu.Common.DatabaseObjects;
 
 namespace Tofu.Bancho.Clients {
     /// <summary>
