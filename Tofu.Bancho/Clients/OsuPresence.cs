@@ -1,6 +1,7 @@
 using Tofu.Bancho.Packets.Build282.Enums;
+using Tofu.Bancho.Packets.Common.Enums;
 
-namespace Tofu.Bancho.PacketObjects {
+namespace Tofu.Bancho.Clients {
     public class OsuPresence {
         public Status UserStatus      = Status.Idle;
         public string BeatmapChecksum = "";

@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
-using Tofu.Bancho.DatabaseObjects;
-using Tofu.Bancho.PacketObjects;
-using Tofu.Bancho.PacketObjects.Enums;
 using Tofu.Bancho.Packets;
 using Tofu.Bancho.Packets.Common.Enums;
 
