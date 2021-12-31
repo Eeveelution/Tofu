@@ -20,13 +20,13 @@ namespace Tofu.OsuWeb.Controllers {
             string avatarLocationPng = $"avatars/{avatar}.png";
             string avatarLocationJpg = $"avatars/{avatar}.jpg";
 
-            if (System.IO.File.Exists(avatarLocationJpg)) {
+            if (SystemFile.Exists(avatarLocationJpg)) {
                 avatarFile = await SystemFile.ReadAllBytesAsync(avatarLocationJpg);
 
                 return File(avatarFile, "image/jpeg");
             }
 
-            if (System.IO.File.Exists(avatarLocationPng)) {
+            if (SystemFile.Exists(avatarLocationPng)) {
                 avatarFile = await SystemFile.ReadAllBytesAsync(avatarLocationPng);
 
                 return File(avatarFile, "image/png");
