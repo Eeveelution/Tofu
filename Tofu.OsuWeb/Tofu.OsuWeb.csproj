@@ -10,7 +10,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers" />
+      <ProjectReference Include="..\Tofu.Bancho\Tofu.Bancho.csproj" />
+      <ProjectReference Include="..\Tofu.Common\Tofu.Common.csproj" />
     </ItemGroup>
 
 </Project>
