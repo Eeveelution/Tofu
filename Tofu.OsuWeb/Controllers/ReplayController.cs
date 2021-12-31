@@ -15,7 +15,7 @@ namespace Tofu.OsuWeb.Controllers {
             if (SystemFile.Exists(replayPath)) {
                 byte[] replayBytes = await SystemFile.ReadAllBytesAsync(replayPath);
 
-                const string incrementCountSql = "UPDATE tofu.scores SET watch_count = watch_count + 1 WHERE score_id = @scoreid";
+                const string incrementCountSql = "UPDATE tofu.scores SET scores.watch_count = scores.watch_count + 1 WHERE scores.score_id = @scoreid";
 
                 MySqlParameter[] incrementCountParams = new[] {
                     new MySqlParameter("@scoreid", scoreId)
