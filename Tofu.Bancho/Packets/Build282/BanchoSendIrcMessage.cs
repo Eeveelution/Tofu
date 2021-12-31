@@ -8,11 +8,11 @@ namespace Tofu.Bancho.Packets.Build282 {
         [BanchoSerialize] public string Message;
 
         public static BanchoSendIrcMessage Create(Message message) => new BanchoSendIrcMessage {
-            Sender = message.Sender, Message = $"<{message.Target}> {message.Content}"
+            Sender = message.Sender, Message = message.Content
         };
 
         public Packet ToPacket() => new(RequestType.BanchoSendIrcMessage, this);
 
-        public static implicit operator Packet(BanchoSendIrcMessage response) => response.ToPacket();
+        public static implicit operator Packet(BanchoSendIrcMessage message) => message.ToPacket();
     }
 }

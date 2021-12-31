@@ -58,34 +58,56 @@ namespace Tofu.Bancho.Clients.OsuClients {
             this.LastPongTime = DateTime.Now;
 
             using MemoryStream dataStream = new MemoryStream(data);
-            using BanchoReader dataReader = new BanchoReader(dataStream);
+            using BinaryReader dataReader = new BinaryReader(dataStream);
 
             //Read while the Stream isn't over
             while (dataReader.BaseStream.Position < dataReader.BaseStream.Length) {
-                //Read Header
-                RequestType requestType = (RequestType) dataReader.ReadUInt16();
+                try {
+                    //Read Header
+                    RequestType requestType = (RequestType) dataReader.ReadUInt16();
 
-                //Log if it's not a pong
-                if(requestType != RequestType.OsuPong)
-                    Logger.Log($"[b282] <{this.Username}@{this.Id}> Got Packet {requestType}", LoggerLevelInfo.Instance);
+                    //Log if it's not a pong
+                    if (requestType != RequestType.OsuPong)
+                        Logger.Log($"[b282] <{this.Username}@{this.Id}> Got Packet {requestType}", LoggerLevelInfo.Instance);
 
-                int packetLength = dataReader.ReadInt32();
+                    int packetLength = dataReader.ReadInt32();
+                    byte[] packetBytes = dataReader.ReadBytes(packetLength);
 
-                using MemoryStream stream = new MemoryStream(dataReader.ReadBytes(packetLength));
-                using BanchoReader reader = new BanchoReader(stream);
+                    using MemoryStream stream = new MemoryStream(packetBytes);
+                    using BanchoReader reader = new BanchoReader(stream);
 
-                //Handle Packets
-                switch (requestType) {
-                    case RequestType.OsuExit: {
-                        this.Kill("Client exited.");
-                        break;
+                    reader.BaseStream.Position = 0;
+
+                    if (reader.BaseStream.Position != 0) {
+                        Console.WriteLine("|OIJUDSHFiuDSHGbf;ldsBGhfkDSBVLJHFDSGHLOFSHGFV");
                     }
-                    case RequestType.OsuRequestStatusUpdate: {
-                        foreach (ClientOsu client in Global.Bancho.ClientManager.OsuClients) {
-                            this.HandleOsuUpdate(client);
+
+                    //Handle Packets
+                    switch (requestType) {
+                        case RequestType.OsuExit: {
+                            this.Kill("Client exited.");
+                            break;
                         }
-                        break;
+                        case RequestType.OsuRequestStatusUpdate: {
+                            foreach (ClientOsu client in Global.Bancho.ClientManager.OsuClients) {
+                                this.HandleOsuUpdate(client);
+                            }
+                            break;
+                        }
+                        case RequestType.OsuSendIrcMessage: {
+                            Message message = new Message();
+
+                            message.Sender  = this.Username;
+                            message.Content = reader.ReadString();
+
+                            Global.Bancho.ClientManager.BroadcastPacketOsuExceptSelf(clientOsu => clientOsu.SendIrcMessage(message), this);
+
+                            break;
+                        }
                     }
+                }
+                catch (Exception e) {
+
                 }
             }
         }
@@ -132,6 +154,10 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// </summary>
         public override void RegistrationComplete() {
             Global.Bancho.ClientManager.BroadcastPacketOsu(client => client.HandleOsuUpdate(this));
+
+            foreach (ClientOsu client in Global.Bancho.ClientManager.OsuClients) {
+                this.HandleOsuUpdate(client);
+            }
 
             this.SendIrcMessage("Welcome to Tofu!Bancho!");
         }
