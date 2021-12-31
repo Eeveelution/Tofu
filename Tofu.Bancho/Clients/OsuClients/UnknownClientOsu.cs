@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
-using Tofu.Bancho.Packets.Build282.Enums;
 using Tofu.Bancho.Packets.Common;
 using Tofu.Bancho.Packets.Common.Enums;
 using Tofu.Common.DatabaseObjects;
@@ -36,6 +35,8 @@ namespace Tofu.Bancho.Clients.OsuClients {
             string username;
             string password;
             string clientInfo;
+
+            this.ClientData = new ClientData();
 
             StreamReader reader = new StreamReader(this.ClientStream);
 
@@ -88,6 +89,9 @@ namespace Tofu.Bancho.Clients.OsuClients {
                    return false;
                }
 
+               this.User.FetchAllStats();
+               this.SendLoginResponse((int) this.User.Id);
+
                return true;
             }
 
@@ -97,7 +101,6 @@ namespace Tofu.Bancho.Clients.OsuClients {
         private void SendLoginResponse(LoginResult result) {
             switch (this.ClientData.ClientType) {
                 case ClientType.Build282: {
-                    //If the Login was successful while in Unauthenticated
                     switch (result) {
                         case LoginResult.AuthFailed:
                         case LoginResult.Unauthorized:
@@ -110,7 +113,6 @@ namespace Tofu.Bancho.Clients.OsuClients {
                             return;
                         default:
                             this.SendLoginResponse((int) this.User.Id);
-                            this.User.FetchAllStats();
                             break;
                     }
                     break;

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
+using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.Packets;
 using Tofu.Bancho.Packets.Common.Enums;
 
@@ -58,6 +59,8 @@ namespace Tofu.Bancho.Clients.OsuClients {
         public abstract void LoginResponse(int userId);
         public abstract void Ping();
         public abstract void HandleOsuUpdate(ClientOsu clientOsu);
+        public abstract void SendIrcMessage(Message message);
+        public abstract void SendIrcMessage(string message);
 
         #endregion
 

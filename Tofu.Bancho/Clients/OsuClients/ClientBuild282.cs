@@ -1,13 +1,14 @@
 using System;
 using System.IO;
-using System.Net.Sockets;
 using EeveeTools.Helpers;
 using Kettu;
 using Tofu.Bancho.Logging;
+using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.Packets;
 using Tofu.Bancho.Packets.Build282;
 using Tofu.Bancho.Packets.Build282.Enums;
 using Tofu.Bancho.Packets.Common;
+using Tofu.Common;
 
 namespace Tofu.Bancho.Clients.OsuClients {
     public class ClientBuild282 : ClientOsu {
@@ -18,6 +19,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
         public ClientBuild282(UnknownClientOsu clientOsu) : base(clientOsu.Client) {
             this.User       = clientOsu.User;
             this.ClientData = clientOsu.ClientData;
+            this.Presence   = new OsuPresence();
         }
         /// <summary>
         /// Handles the client
@@ -80,7 +82,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
                     }
                     case RequestType.OsuRequestStatusUpdate: {
                         foreach (ClientOsu client in Global.Bancho.ClientManager.OsuClients) {
-                            //this.HandleOsuUpdate(client.ClientInformation.GetStats(client.ClientInformation.CurrentPlayMode));
+                            this.HandleOsuUpdate(client);
                         }
                         break;
                     }
@@ -129,7 +131,9 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// Gets called upon successful Registration
         /// </summary>
         public override void RegistrationComplete() {
-            //Global.Bancho.ClientManager.BroadcastPacketOsu(client => client.HandleOsuUpdate(this.ClientInformation.GetStats(this.CurrentPlayMode)));
+            Global.Bancho.ClientManager.BroadcastPacketOsu(client => client.HandleOsuUpdate(this));
+
+            this.SendIrcMessage("Welcome to Tofu!Bancho!");
         }
 
         #region Packets
@@ -145,8 +149,22 @@ namespace Tofu.Bancho.Clients.OsuClients {
         public override void Ping() => this.QueuePacket(new BanchoPing());
         /// <summary>
         /// Sends a BanchoHandleOsuUpdate
+        /// <param name="clientOsu">ClientOsu to inform this client about</param>
         /// </summary>
         public override void HandleOsuUpdate(ClientOsu clientOsu) => this.QueuePacket(BanchoHandleOsuUpdate.Create(clientOsu));
+        /// <summary>
+        /// Sends a BanchoSendIrcMessage
+        /// </summary>
+        /// <param name="message">Message to send</param>
+        public override void SendIrcMessage(Message message) => this.QueuePacket(BanchoSendIrcMessage.Create(message));
+        /// <summary>
+        /// Sends a BanchoSendIrcMessage
+        /// </summary>
+        /// <param name="message">Message to send</param>
+        public override void SendIrcMessage(string message) => this.QueuePacket(BanchoSendIrcMessage.Create(new Message {
+            Content = message,
+            Sender = "TofuBot",
+        }));
 
         #endregion
 
