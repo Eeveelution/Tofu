@@ -38,7 +38,6 @@ namespace Tofu.Bancho.Clients {
         /// <summary>
         /// Creates a raw client
         /// </summary>
-        /// <param name="bancho">Bancho</param>
         /// <param name="client">TCP Socket</param>
         public Client(TcpClient client) {
             this.TcpClient    = client;

@@ -100,12 +100,12 @@ namespace Tofu.Bancho {
                     UnknownClientOsu unknownClientOsu = new UnknownClientOsu(newClient);
 
                     //Authenticate
-                    unknownClientOsu.PerformAuth();
+                    if(unknownClientOsu.PerformAuth()) {
+                        //Upgrade the Connection
+                        ClientOsu clientOsu = unknownClientOsu.ToClientOsu();
 
-                    //Upgrade the Connection
-                    ClientOsu clientOsu = unknownClientOsu.ToClientOsu();
-
-                    this.ClientManager.RegisterClient(clientOsu);
+                        this.ClientManager.RegisterClient(clientOsu);
+                    }
                 });
             }
         }

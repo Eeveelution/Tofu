@@ -17,12 +17,10 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// <summary>
         /// Creates a b282 osu! Client
         /// </summary>
-        /// <param name="client">The TCP Socket it's using</param>
-        /// <param name="user">What user is this</param>
-        /// <param name="clientData">Client Information from Login string</param>
-        public ClientBuild282(TcpClient client, User user, ClientData clientData) : base(client) {
-            this.User       = user;
-            this.ClientData = clientData;
+        /// <param name="clientOsu">UnknownClientOsu to pull data from</param>
+        public ClientBuild282(UnknownClientOsu clientOsu) : base(clientOsu.Client) {
+            this.User       = clientOsu.User;
+            this.ClientData = clientOsu.ClientData;
         }
         /// <summary>
         /// Handles the client

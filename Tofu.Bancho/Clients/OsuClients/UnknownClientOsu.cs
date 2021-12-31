@@ -12,8 +12,8 @@ namespace Tofu.Bancho.Clients.OsuClients {
     /// A Unauthenticated ClientOsu
     /// </summary>
     public class UnknownClientOsu {
-        private TcpClient     _client;
-        private NetworkStream _clientStream;
+        public readonly TcpClient     Client;
+        public readonly NetworkStream ClientStream;
 
         /// <summary>
         /// Everything known about the User
@@ -25,22 +25,22 @@ namespace Tofu.Bancho.Clients.OsuClients {
         public ClientData ClientData;
 
         public UnknownClientOsu(TcpClient client) {
-            this._client       = client;
-            this._clientStream = client.GetStream();
+            this.Client       = client;
+            this.ClientStream = client.GetStream();
         }
 
         /// <summary>
         /// Handles authentication
         /// </summary>
         /// <returns></returns>
-        public void PerformAuth() {
+        public bool PerformAuth() {
             string username;
             string password;
             string clientInfo;
 
-            StreamReader reader = new StreamReader(this._clientStream);
+            StreamReader reader = new StreamReader(this.ClientStream);
 
-            if (this._clientStream.DataAvailable && this._clientStream.CanRead) {
+            if (this.ClientStream.DataAvailable && this.ClientStream.CanRead) {
                 //Read the Login String
                 username = reader.ReadLine();
                 password = reader.ReadLine();
@@ -48,7 +48,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
 
                 if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password) || string.IsNullOrEmpty(clientInfo)) {
                     this.Kill();
-                    return;
+                    return false;
                 }
 
                 string[] split = clientInfo.Split('|');
@@ -64,7 +64,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
                             this.ClientData.Timezone = byte.Parse(split[1]);
                         } catch {
                             this.Kill();
-                            return;
+                            return false;
                         }
 
                         break;
@@ -75,14 +75,24 @@ namespace Tofu.Bancho.Clients.OsuClients {
                this.User = databaseUser;
 
                if (databaseUser == null) {
-
-                   return;
+                    this.SendLoginResponse(LoginResult.AuthFailed);
+                    return false;
                }
 
                if (databaseUser.Password != password) {
-
+                   this.SendLoginResponse(LoginResult.AuthFailed);
+                   return false;
                }
+
+               if (databaseUser.Banned) {
+                   this.SendLoginResponse(LoginResult.Banned);
+                   return false;
+               }
+
+               return true;
             }
+
+            return false;
         }
 
         private void SendLoginResponse(LoginResult result) {
@@ -114,10 +124,10 @@ namespace Tofu.Bancho.Clients.OsuClients {
 
             switch (this.ClientData.ClientType) {
                 case ClientType.Build282:
-                    response.ToPacket().Send(this._clientStream, false);
+                    response.ToPacket().Send(this.ClientStream, false);
                     break;
                 default:
-                    response.ToPacket().Send(this._clientStream);
+                    response.ToPacket().Send(this.ClientStream);
                     break;
             }
         }
@@ -126,8 +136,8 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// Kills the Client
         /// </summary>
         public void Kill() {
-            this._client.Close();
-            this._clientStream.Close();
+            this.Client.Close();
+            this.ClientStream.Close();
         }
 
         /// <summary>
@@ -137,7 +147,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public ClientOsu ToClientOsu() {
             return this.ClientData.ClientType switch {
-                ClientType.Build282 => new ClientBuild282(this._client, this.User, this.ClientData),
+                ClientType.Build282 => new ClientBuild282(this),
                 ClientType.Irc      => null,
                 _                   => throw new ArgumentOutOfRangeException()
             };
