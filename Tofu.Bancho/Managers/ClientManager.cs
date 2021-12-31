@@ -38,22 +38,22 @@ namespace Tofu.Bancho.Managers {
                 Client existingClient;
 
                 //Check for duplicate clients
-                existingClient = this.GetClientById(client.ClientInformation.Id);
+                existingClient = this.GetClientById(client.Id);
                 existingClient?.Kill("Duplicate Client.");
 
-                existingClient = this.GetClientByName(client.ClientInformation.Username);
+                existingClient = this.GetClientByName(client.Username);
                 existingClient?.Kill("Duplicate Client.");
 
                 //Add it to all the lists
                 this.Clients.Add(client);
-                this.ClientsByName.Add(client.ClientInformation.Username, client);
-                this.ClientsById.Add(client.ClientInformation.Id, client);
+                this.ClientsByName.Add(client.Username, client);
+                this.ClientsById.Add(client.Id, client);
 
                 //If it's an osu! client add it to those respective lists
                 if (client is ClientOsu clientOsu) {
                     this.OsuClients.Add(clientOsu);
-                    this.OsuClientsByName.Add(client.ClientInformation.Username, clientOsu);
-                    this.OsuClientsById.Add(client.ClientInformation.Id, clientOsu);
+                    this.OsuClientsByName.Add(client.Username, clientOsu);
+                    this.OsuClientsById.Add(client.Id, clientOsu);
                 }
 
                 //Make client handle a complete registration
@@ -70,12 +70,12 @@ namespace Tofu.Bancho.Managers {
         public void RemoveClient(Client client) {
             lock(this._clientListLock){
                 this.Clients.Remove(client);
-                this.ClientsByName.Remove(client.ClientInformation.Username);
-                this.ClientsById.Remove(client.ClientInformation.Id);
+                this.ClientsByName.Remove(client.Username);
+                this.ClientsById.Remove(client.Id);
 
                 if (client is ClientOsu) {
-                    this.OsuClientsByName.Remove(client.ClientInformation.Username);
-                    this.OsuClientsById.Remove(client.ClientInformation.Id);
+                    this.OsuClientsByName.Remove(client.Username);
+                    this.OsuClientsById.Remove(client.Id);
                 }
             }
         }

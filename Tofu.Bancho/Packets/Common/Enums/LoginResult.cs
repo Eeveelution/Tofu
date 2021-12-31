@@ -5,6 +5,6 @@ namespace Tofu.Bancho.PacketObjects.Enums {
         Banned          = -3,
         Unauthorized    = -4,
         ServerFailure   = -5,
-        Succeeded = 0,
+        Succeeded       = 0,
     }
 }

@@ -23,5 +23,6 @@ namespace Tofu.Bancho.DatabaseObjects {
         public long HitMiss { get; set; }
         public long HitGeki { get; set; }
         public long HitKatu { get; set; }
+        public long Rank { get; set; }
     }
 }

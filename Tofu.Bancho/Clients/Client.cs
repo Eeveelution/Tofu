@@ -1,5 +1,8 @@
 using System.IO;
 using System.Net.Sockets;
+using Tofu.Bancho.DatabaseObjects;
+using Tofu.Bancho.PacketObjects;
+using Tofu.Bancho.PacketObjects.Enums;
 
 namespace Tofu.Bancho.Clients {
     /// <summary>
@@ -20,9 +23,17 @@ namespace Tofu.Bancho.Clients {
         protected BinaryWriter  StreamWriter;
 
         /// <summary>
-        /// The Client's information
+        /// Everything known about the User
         /// </summary>
-        public ClientInformation ClientInformation;
+        public User User;
+        /// <summary>
+        /// User Id of the CLient
+        /// </summary>
+        public int Id => (int) User.Id;
+        /// <summary>
+        /// Username of the Client
+        /// </summary>
+        public string Username => User.Username;
 
         /// <summary>
         /// Creates a raw client

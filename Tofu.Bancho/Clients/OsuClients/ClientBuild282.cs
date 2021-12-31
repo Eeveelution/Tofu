@@ -3,6 +3,7 @@ using System.IO;
 using System.Net.Sockets;
 using EeveeTools.Helpers;
 using Kettu;
+using Tofu.Bancho.DatabaseObjects;
 using Tofu.Bancho.Logging;
 using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.PacketObjects.Enums;
@@ -17,9 +18,11 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// Creates a b282 osu! Client
         /// </summary>
         /// <param name="client">The TCP Socket it's using</param>
-        /// <param name="information">The currently known information about the client</param>
-        public ClientBuild282(TcpClient client, ClientInformation information) : base(client) {
-            this.ClientInformation = information;
+        /// <param name="user">What user is this</param>
+        /// <param name="clientData">Client Information from Login string</param>
+        public ClientBuild282(TcpClient client, User user, ClientData clientData) : base(client) {
+            this.User       = user;
+            this.ClientData = clientData;
         }
         /// <summary>
         /// Handles the client
@@ -67,7 +70,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
 
                 //Log if it's not a pong
                 if(requestType != RequestType.OsuPong)
-                    Logger.Log($"[b282] <{this.ClientInformation.Username}@{this.ClientInformation.Id}> Got Packet {requestType}", LoggerLevelInfo.Instance);
+                    Logger.Log($"[b282] <{this.Username}@{this.Id}> Got Packet {requestType}", LoggerLevelInfo.Instance);
 
                 int packetLength = dataReader.ReadInt32();
 
@@ -82,7 +85,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
                     }
                     case RequestType.OsuRequestStatusUpdate: {
                         foreach (ClientOsu client in Global.Bancho.ClientManager.OsuClients) {
-                            this.HandleOsuUpdate(client.ClientInformation.GetStats(client.ClientInformation.CurrentPlayMode));
+                            //this.HandleOsuUpdate(client.ClientInformation.GetStats(client.ClientInformation.CurrentPlayMode));
                         }
                         break;
                     }
@@ -98,7 +101,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
                 //While there's more packets to send
                 while(this.PacketQueue.TryDequeue(out Packet packet)) {
                     if((RequestType)packet.PacketId != RequestType.BanchoPing)
-                        Logger.Log($"[b282] <{this.ClientInformation.Username}@{this.ClientInformation.Id}> Sending { (RequestType) packet.PacketId }", LoggerLevelInfo.Instance);
+                        Logger.Log($"[b282] <{this.Username}@{this.Id}> Sending { (RequestType) packet.PacketId }", LoggerLevelInfo.Instance);
 
                     //Send
                     packet.Send(this.ClientStream, false);
@@ -122,7 +125,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// </summary>
         /// <param name="reason">Potential Reason</param>
         public override void Kill(string reason) {
-            Logger.Log($"[b282] <{this.ClientInformation.Username}@{this.ClientInformation.Id}> Killed for: {reason}", LoggerLevelInfo.Instance);
+            Logger.Log($"[b282] <{this.Username}@{this.Id}> Killed for: {reason}", LoggerLevelInfo.Instance);
 
             Global.Bancho.ClientManager.RemoveClient(this);
         }
@@ -131,24 +134,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// Gets called upon successful Registration
         /// </summary>
         public override void RegistrationComplete() {
-            //If the Login was successful while in Unauthenticated
-            switch (this.ClientInformation.PendingLoginResult) {
-                case LoginResult.AuthFailed:
-                case LoginResult.Unauthorized:
-                case LoginResult.Banned:
-                case LoginResult.ServerFailure:
-                    this.LoginResponse(-1);
-                    return;
-                case LoginResult.VersionMismatch:
-                    this.LoginResponse(-2);
-                    return;
-                default:
-                    this.LoginResponse(this.ClientInformation.Id);
-                    this.ClientInformation.User.FetchAllStats();
-                    break;
-            }
-
-            Global.Bancho.ClientManager.BroadcastPacketOsu(client => client.HandleOsuUpdate(this.ClientInformation.GetStats(this.ClientInformation.CurrentPlayMode)));
+            //Global.Bancho.ClientManager.BroadcastPacketOsu(client => client.HandleOsuUpdate(this.ClientInformation.GetStats(this.CurrentPlayMode)));
         }
 
         #region Packets
@@ -165,8 +151,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// <summary>
         /// Sends a BanchoHandleOsuUpdate
         /// </summary>
-        /// <param name="update">Update Object</param>
-        public override void HandleOsuUpdate(Stats update) => this.QueuePacket(BanchoHandleOsuUpdate.FromStatsUpdate(update));
+        public override void HandleOsuUpdate(ClientOsu clientOsu) => this.QueuePacket(BanchoHandleOsuUpdate.Create(clientOsu));
 
         #endregion
 

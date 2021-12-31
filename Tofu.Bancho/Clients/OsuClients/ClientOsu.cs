@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Net.Sockets;
+using Tofu.Bancho.DatabaseObjects;
 using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.PacketObjects.Enums;
 using Tofu.Bancho.Packets;
+using Tofu.Bancho.Packets.Common.Enums;
 
 namespace Tofu.Bancho.Clients.OsuClients {
     public abstract class ClientOsu : Client {
@@ -31,9 +33,19 @@ namespace Tofu.Bancho.Clients.OsuClients {
         protected readonly TimeSpan PongTimeout = new TimeSpan(0, 0, 0, 20);
 
         /// <summary>
+        /// osu! Presence Information
+        /// </summary>
+        public OsuPresence Presence;
+        /// <summary>
+        /// Current Playmode
+        /// </summary>
+        public Playmode CurrentPlayMode;
+
+        public ClientData ClientData;
+
+        /// <summary>
         /// Creates a ClientOsu
         /// </summary>
-        /// <param name="bancho">Bancho it's connected to</param>
         /// <param name="client">TcpClient</param>
         public ClientOsu(TcpClient client) : base(client) {
             this.PacketQueue  = new ConcurrentQueue<Packet>();
@@ -48,7 +60,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
         public virtual void LoginResponse(LoginResult result) { this.LoginResponse((int) result); }
         public abstract void LoginResponse(int userId);
         public abstract void Ping();
-        public abstract void HandleOsuUpdate(Stats update);
+        public abstract void HandleOsuUpdate(ClientOsu clientOsu);
 
         #endregion
 

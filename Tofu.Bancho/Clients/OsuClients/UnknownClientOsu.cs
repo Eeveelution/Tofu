@@ -5,18 +5,24 @@ using Tofu.Bancho.DatabaseObjects;
 using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.PacketObjects.Enums;
 using Tofu.Bancho.Packets.Build282.Enums;
+using Tofu.Bancho.Packets.Common;
 
 namespace Tofu.Bancho.Clients.OsuClients {
     /// <summary>
     /// A Unauthenticated ClientOsu
     /// </summary>
     public class UnknownClientOsu {
-        private ClientType _clientType;
-
         private TcpClient     _client;
         private NetworkStream _clientStream;
 
-        private ClientInformation _clientInformation;
+        /// <summary>
+        /// Everything known about the User
+        /// </summary>
+        public User User;
+        /// <summary>
+        /// All the Client Data we can get from the Login request
+        /// </summary>
+        public ClientData ClientData;
 
         public UnknownClientOsu(TcpClient client) {
             this._client       = client;
@@ -28,16 +34,6 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// </summary>
         /// <returns></returns>
         public void PerformAuth() {
-            this._clientInformation = new ClientInformation {
-                CurrentPlayMode = 0,
-                Presence = new OsuPresence {
-                    BeatmapChecksum = "",
-                    StatusText = "",
-                    EnabledMods = Mods.None,
-                    UserStatus = Status.Idle
-                }
-            };
-
             string username;
             string password;
             string clientInfo;
@@ -62,10 +58,10 @@ namespace Tofu.Bancho.Clients.OsuClients {
 
                 switch (version) {
                     case "b282":
-                        this._clientType = ClientType.Build282;
+                        this.ClientData.ClientType = ClientType.Build282;
 
                         try {
-                            this._clientInformation.Timezone = int.Parse(split[1]);
+                            this.ClientData.Timezone = byte.Parse(split[1]);
                         } catch {
                             this.Kill();
                             return;
@@ -76,25 +72,56 @@ namespace Tofu.Bancho.Clients.OsuClients {
 
                User databaseUser = User.FromDatabase(username);
 
-               this._clientInformation.User = databaseUser;
+               this.User = databaseUser;
 
                if (databaseUser == null) {
-                   this._clientInformation.PendingLoginResult = LoginResult.AuthFailed;
-                   this._clientInformation.User = new User {
-                       Username = username, Id = -1
-                   };
+
                    return;
                }
 
                if (databaseUser.Password != password) {
-                   this._clientInformation.PendingLoginResult = LoginResult.AuthFailed;
-                   this._clientInformation.User = new User {
-                       Username = username, Id = -1
-                   };
-                   return;
+
                }
             }
         }
+
+        private void SendLoginResponse(LoginResult result) {
+            switch (this.ClientData.ClientType) {
+                case ClientType.Build282: {
+                    //If the Login was successful while in Unauthenticated
+                    switch (result) {
+                        case LoginResult.AuthFailed:
+                        case LoginResult.Unauthorized:
+                        case LoginResult.Banned:
+                        case LoginResult.ServerFailure:
+                            this.SendLoginResponse(-1);
+                            return;
+                        case LoginResult.VersionMismatch:
+                            this.SendLoginResponse(-2);
+                            return;
+                        default:
+                            this.SendLoginResponse((int) this.User.Id);
+                            this.User.FetchAllStats();
+                            break;
+                    }
+                    break;
+                }
+            }
+        }
+
+        private void SendLoginResponse(int id) {
+            BanchoLoginResponse response = new BanchoLoginResponse(id);
+
+            switch (this.ClientData.ClientType) {
+                case ClientType.Build282:
+                    response.ToPacket().Send(this._clientStream, false);
+                    break;
+                default:
+                    response.ToPacket().Send(this._clientStream);
+                    break;
+            }
+        }
+
         /// <summary>
         /// Kills the Client
         /// </summary>
@@ -109,8 +136,8 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// <returns>A Upgraded ClientOsu</returns>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         public ClientOsu ToClientOsu() {
-            return this._clientType switch {
-                ClientType.Build282 => new ClientBuild282(this._client, this._clientInformation),
+            return this.ClientData.ClientType switch {
+                ClientType.Build282 => new ClientBuild282(this._client, this.User, this.ClientData),
                 ClientType.Irc      => null,
                 _                   => throw new ArgumentOutOfRangeException()
             };

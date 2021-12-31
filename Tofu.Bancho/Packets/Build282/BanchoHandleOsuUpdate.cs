@@ -1,6 +1,9 @@
+using Tofu.Bancho.Clients.OsuClients;
+using Tofu.Bancho.DatabaseObjects;
 using Tofu.Bancho.Helpers.BanchoSerializer;
 using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.Packets.Build282.Enums;
+using Tofu.Bancho.Packets.Common.Enums;
 
 namespace Tofu.Bancho.Packets.Build282 {
     public class BanchoHandleOsuUpdate : Serializable {
@@ -20,21 +23,32 @@ namespace Tofu.Bancho.Packets.Build282 {
         [BanchoSerialize] public string Location;
 
         public Packet ToPacket() => new(RequestType.BanchoHandleOsuUpdate, this);
-        public static BanchoHandleOsuUpdate FromStatsUpdate(Stats update) => new BanchoHandleOsuUpdate {
-            UserId          = update.UserId,
-            Username        = update.Username,
-            RankedScore     = update.RankedScore,
-            Accuracy        = update.Accuracy,
-            Playcount       = update.Playcount,
-            TotalScore      = update.TotalScore,
-            AvatarFilename  = update.Username,
-            BeatmapChecksum = update.Presence.BeatmapChecksum,
-            UserStatus      = update.Presence.UserStatus,
-            StatusText      = update.Presence.StatusText,
-            Mods            = update.Presence.EnabledMods,
-            Timezone        = update.Timezone,
-            Location        = update.Location
-        };
+        public static BanchoHandleOsuUpdate Create(ClientOsu clientOsu) {
+            UserStats stats = clientOsu.CurrentPlayMode switch {
+                Playmode.Osu   => clientOsu.User.OsuStats,
+                Playmode.Taiko => clientOsu.User.TaikoStats,
+                Playmode.Catch => clientOsu.User.CatchStats,
+                Playmode.Mania => clientOsu.User.ManiaStats,
+                _              => clientOsu.User.OsuStats
+            };
+
+            return new BanchoHandleOsuUpdate {
+                UserId          = clientOsu.Id,
+                Username        = clientOsu.Username,
+                RankedScore     = stats.RankedScore,
+                TotalScore      = stats.TotalScore,
+                Accuracy        = stats.Accuracy,
+                Playcount       = (int) stats.Playcount,
+                Rank            = (int) stats.Rank,
+                AvatarFilename  = clientOsu.Username,
+                StatusText      = clientOsu.Presence.StatusText,
+                BeatmapChecksum = clientOsu.Presence.BeatmapChecksum,
+                Mods            = clientOsu.Presence.EnabledMods,
+                UserStatus      = clientOsu.Presence.UserStatus,
+                Timezone        = clientOsu.ClientData.Timezone,
+                Location        = clientOsu.User.Location
+            };
+        }
         public static implicit operator Packet(BanchoHandleOsuUpdate response) => response.ToPacket();
     }
 }
