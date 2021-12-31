@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tofu.OsuWeb", "Tofu.OsuWeb\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tofu.Bancho", "Tofu.Bancho\Tofu.Bancho.csproj", "{EFEDC817-B89D-4B9B-9E98-5A0E8FF8DECF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tofu.Common", "Tofu.Common\Tofu.Common.csproj", "{78EA801B-69C8-4B02-9800-E9A87429FEED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{EFEDC817-B89D-4B9B-9E98-5A0E8FF8DECF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EFEDC817-B89D-4B9B-9E98-5A0E8FF8DECF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFEDC817-B89D-4B9B-9E98-5A0E8FF8DECF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78EA801B-69C8-4B02-9800-E9A87429FEED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78EA801B-69C8-4B02-9800-E9A87429FEED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78EA801B-69C8-4B02-9800-E9A87429FEED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78EA801B-69C8-4B02-9800-E9A87429FEED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

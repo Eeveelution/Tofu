@@ -3,6 +3,7 @@ using EeveeTools.Database;
 using EeveeTools.Helpers;
 using MySqlConnector;
 using Tofu.Bancho.Helpers;
+using Tofu.Common;
 
 namespace Tofu.Bancho.DatabaseObjects {
     public class User {
@@ -36,7 +37,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@username", username)
                 };
 
-                long usernameCount = (long) DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, duplicateUsernameCheck, duplicateUsernameParams)["count"];
+                long usernameCount = (long) DatabaseHelper.MySqlQueryOne(CommonGlobal.DatabaseContext, duplicateUsernameCheck, duplicateUsernameParams)["count"];
 
                 if (usernameCount != 0)
                     return (false, "Username already exists!", null);
@@ -48,7 +49,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@email", email)
                 };
 
-                long emailCount = (long) DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, duplicateEmailCheck, duplicateEmailParams)["count"];
+                long emailCount = (long) DatabaseHelper.MySqlQueryOne(CommonGlobal.DatabaseContext, duplicateEmailCheck, duplicateEmailParams)["count"];
 
                 if (emailCount != 0)
                     return (false, "This mail adress has already been registered!", null);
@@ -64,12 +65,12 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@username", username), new MySqlParameter("@password", password), new MySqlParameter("@privileges", privileges), new MySqlParameter("@email", email), new MySqlParameter("@userpage", ""),
                 };
 
-                MySqlDatabaseHandler.MySqlNonQuery(Global.DatabaseContext, insertUserSql, insertUserParams);
+                MySqlDatabaseHandler.MySqlNonQuery(CommonGlobal.DatabaseContext, insertUserSql, insertUserParams);
 
                 const string getUserIdSql = "SELECT users.id FROM tofu.users WHERE users.username = @username";
 
                 //We can just reuse the params from earlier, no need to create em again
-                long userId = (long) DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, getUserIdSql, duplicateUsernameParams)["id"];
+                long userId = (long) DatabaseHelper.MySqlQueryOne(CommonGlobal.DatabaseContext, getUserIdSql, duplicateUsernameParams)["id"];
 
                 const string insertStatsStatsSql = "INSERT INTO tofu.stats (user_id, mode) VALUES (@userid, 0), (@userid, 1), (@userid, 2), (@userid, 3)";
 
@@ -77,7 +78,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@userid", userId)
                 };
 
-                MySqlDatabaseHandler.MySqlNonQuery(Global.DatabaseContext, insertStatsStatsSql, insertStatsParams);
+                MySqlDatabaseHandler.MySqlNonQuery(CommonGlobal.DatabaseContext, insertStatsStatsSql, insertStatsParams);
 
                 return (true, "Registered successfully!", FromDatabase(userId));
             }
@@ -100,7 +101,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@userid", userId)
                 };
 
-                var result = DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, userFetchSql, userFetchParams);
+                var result = DatabaseHelper.MySqlQueryOne(CommonGlobal.DatabaseContext, userFetchSql, userFetchParams);
 
                 if (result == null)
                     return null;
@@ -124,7 +125,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                     new MySqlParameter("@username", username)
                 };
 
-                var result = DatabaseHelper.MySqlQueryOne(Global.DatabaseContext, userFetchSql, userFetchParams);
+                var result = DatabaseHelper.MySqlQueryOne(CommonGlobal.DatabaseContext, userFetchSql, userFetchParams);
 
                 if (result == null)
                     return null;
@@ -153,7 +154,7 @@ namespace Tofu.Bancho.DatabaseObjects {
                 new MySqlParameter("@mode", mode)
             };
 
-            var fetchResults = MySqlDatabaseHandler.MySqlQuery(Global.DatabaseContext, fetchSql, fetchParams);
+            var fetchResults = MySqlDatabaseHandler.MySqlQuery(CommonGlobal.DatabaseContext, fetchSql, fetchParams);
 
             UserStats stats = new UserStats();
             stats.MapDatabaseResults(fetchResults[0]);

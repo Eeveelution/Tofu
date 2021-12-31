@@ -1,10 +1,7 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
-using EeveeTools.Database;
-using MySqlConnector;
 using Tofu.Bancho.DatabaseObjects;
-using Tofu.Bancho.Helpers;
 using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.PacketObjects.Enums;
 using Tofu.Bancho.Packets.Build282.Enums;
