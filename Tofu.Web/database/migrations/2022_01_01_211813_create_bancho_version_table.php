@@ -31,6 +31,6 @@ class CreateBanchoVersionTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bancho_version');
+        Schema::dropIfExists('osu_versions');
     }
 }
