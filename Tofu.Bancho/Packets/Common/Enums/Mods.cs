@@ -1,5 +1,5 @@
 namespace Tofu.Bancho.Packets.Common.Enums {
-    public enum Mods {
+    public enum Mods : ushort {
         None        = 0,
         NoFail      = 1,
         Easy        = 2,

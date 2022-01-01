@@ -84,23 +84,37 @@ namespace Tofu.Bancho.Clients.OsuClients {
 
                     //Handle Packets
                     switch (requestType) {
+                        case RequestType.OsuSendUserStatus: {
+                            OsuSendUserStatus status = new OsuSendUserStatus(stream);
+
+                            this.Presence.StatusText      = status.StatusText;
+                            this.Presence.BeatmapChecksum = status.BeatmapChecksum;
+                            this.Presence.UserStatus      = status.Status;
+                            this.Presence.EnabledMods     = status.CurrentMods;
+
+                            Global.Bancho.ClientManager.BroadcastPacketOsu(client => client.HandleOsuUpdate(this));
+
+                            break;
+                        }
                         case RequestType.OsuExit: {
                             Global.Bancho.ClientManager.BroadcastPacketOsu(clientOsu => clientOsu.HandleOsuQuit(this));
 
                             this.Kill("Client exited.");
+
                             break;
                         }
                         case RequestType.OsuRequestStatusUpdate: {
                             foreach (ClientOsu client in Global.Bancho.ClientManager.OsuClients) {
                                 this.HandleOsuUpdate(client);
                             }
+
                             break;
                         }
                         case RequestType.OsuSendIrcMessage: {
-                            Message message = new Message();
-
-                            message.Sender  = this.Username;
-                            message.Content = reader.ReadString();
+                            Message message = new Message {
+                                Sender = this.Username,
+                                Content = reader.ReadString()
+                            };
 
                             Global.Bancho.ClientManager.BroadcastPacketOsuExceptSelf(clientOsu => clientOsu.SendIrcMessage(message), this);
 
