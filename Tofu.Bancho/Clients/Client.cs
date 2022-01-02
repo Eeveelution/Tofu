@@ -57,6 +57,11 @@ namespace Tofu.Bancho.Clients {
         /// <param name="reason">Potential reason for killing this client</param>
         public abstract void Kill(string reason);
         /// <summary>
+        /// Used for Notifying the client of something important
+        /// </summary>
+        /// <param name="notification">Notification text</param>
+        public abstract void Notify(string notification);
+        /// <summary>
         /// Gets called after Registration of this client was successful
         /// </summary>
         public virtual void RegistrationComplete() {}

@@ -24,7 +24,11 @@ namespace Tofu.Bancho {
         /// <summary>
         /// The Client Manager, handles adding and removing clients, aswell as giving work to Workers
         /// </summary>
-        public  ClientManager    ClientManager;
+        public ClientManager ClientManager;
+        /// <summary>
+        /// The Channel Manager, handles most of Chat, and adding/removing and everything Channel related
+        /// </summary>
+        public ChannelManager ChannelManager;
 
         /// <summary>
         /// How many workers to spawn
@@ -40,12 +44,16 @@ namespace Tofu.Bancho {
             this._banchoListener = new TcpListener(IPAddress.Parse(location), port);
             this._tofuWorkers    = new List<TofuWorker>();
 
-            this.ClientManager   = new ClientManager();
+            this.ClientManager  = new ClientManager();
+            this.ChannelManager = new ChannelManager();
 
             //Initialize Workers
             for (int i = 0; i != WORKER_COUNT; i++) {
                 this.AddWorker();
             }
+
+            //Initialize Channels
+            this.ChannelManager.ReadFromDatabase();
         }
 
         /// <summary>

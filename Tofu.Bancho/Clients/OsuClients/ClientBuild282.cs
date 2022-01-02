@@ -66,9 +66,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
                     //Read Header
                     RequestType requestType = (RequestType) dataReader.ReadUInt16();
 
-                    //Log if it's not a pong
-                    if (requestType != RequestType.OsuPong)
-                        Logger.Log($"[b282] <{this.Username}@{this.Id}> Got Packet {requestType}", LoggerLevelInfo.Instance);
+                    Logger.Log($"[b282] <{this.Username}@{this.Id}> Got Packet {requestType}", LoggerLevelInfo.Instance);
 
                     int packetLength = dataReader.ReadInt32();
                     byte[] packetBytes = dataReader.ReadBytes(packetLength);
@@ -135,8 +133,7 @@ namespace Tofu.Bancho.Clients.OsuClients {
             try {
                 //While there's more packets to send
                 while(this.PacketQueue.TryDequeue(out Packet packet)) {
-                    if((RequestType)packet.PacketId != RequestType.BanchoPing)
-                        Logger.Log($"[b282] <{this.Username}@{this.Id}> Sending { (RequestType) packet.PacketId }", LoggerLevelInfo.Instance);
+                    Logger.Log($"[b282] <{this.Username}@{this.Id}> Sending { (RequestType) packet.PacketId }", LoggerLevelInfo.Instance);
 
                     //Send
                     packet.Send(this.ClientStream, false);
@@ -176,6 +173,13 @@ namespace Tofu.Bancho.Clients.OsuClients {
             }
 
             this.SendIrcMessage("Welcome to Tofu!Bancho!");
+        }
+        /// <summary>
+        /// Used for Notifying the client of something important
+        /// </summary>
+        /// <param name="notification">Notification text</param>
+        public override void Notify(string notification) {
+            this.SendIrcMessage(notification);
         }
 
         #region Packets
