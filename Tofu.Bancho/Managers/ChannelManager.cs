@@ -90,5 +90,11 @@ namespace Tofu.Bancho.Managers {
 
             return true;
         }
+
+        public Channel GetChannelByName(string name) {
+            this._channelsByName.TryGetValue(name, out Channel foundChannel);
+
+            return foundChannel;
+        }
     }
 }

@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using EeveeTools.Database;
 using MySqlConnector;
 using Tofu.Bancho.Clients;
 using Tofu.Bancho.Clients.OsuClients;
 using Tofu.Bancho.Helpers;
 using Tofu.Bancho.PacketObjects;
+using Tofu.Common;
 
 namespace Tofu.Bancho {
     public class Channel {
@@ -85,12 +87,16 @@ namespace Tofu.Bancho {
             }
 
             ThreadHelper.SpawnThread(() => {
-                const string insertLogSql = "INSERT INTO tofu.irc_log (channel, sender, message) VALUES (@channel, @sender, @message)";
+                const string insertLogSql = "INSERT INTO tofu.irc_log (channel, sender_name, sender_id, message) VALUES (@channel, @sender_name, @sender_id, @message)";
 
                 MySqlParameter[] insertLogParams = new [] {
                     new MySqlParameter("@channel", this.Name),
-                    new MySqlParameter("@sender", sender.Username)
-                }
+                    new MySqlParameter("@sender_name", sender.Username),
+                    new MySqlParameter("@sender_id", sender.Id),
+                    new MySqlParameter("@message", message.Content)
+                };
+
+                MySqlDatabaseHandler.MySqlNonQuery(CommonGlobal.DatabaseContext, insertLogSql, insertLogParams);
             });
         }
     }

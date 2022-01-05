@@ -13,6 +13,10 @@ using Tofu.Common;
 namespace Tofu.Bancho.Clients.OsuClients {
     public class ClientBuild282 : ClientOsu {
         /// <summary>
+        /// #osu
+        /// </summary>
+        private Channel _osuChannel;
+        /// <summary>
         /// Creates a b282 osu! Client
         /// </summary>
         /// <param name="clientOsu">UnknownClientOsu to pull data from</param>
@@ -114,6 +118,8 @@ namespace Tofu.Bancho.Clients.OsuClients {
                                 Content = reader.ReadString()
                             };
 
+                            this._osuChannel.SendMessage(this, message);
+
                             Global.Bancho.ClientManager.BroadcastPacketOsuExceptSelf(clientOsu => clientOsu.SendIrcMessage(message), this);
 
                             break;
@@ -172,7 +178,16 @@ namespace Tofu.Bancho.Clients.OsuClients {
                 this.HandleOsuUpdate(client);
             }
 
-            this.SendIrcMessage("Welcome to Tofu!Bancho!");
+            Channel osuChannel = Global.Bancho.ChannelManager.GetChannelByName("#osu");
+            this._osuChannel = osuChannel;
+
+            if (osuChannel.Join(this)) {
+                this.SendIrcMessage("Successfully joined #osu!");
+                this.SendIrcMessage("Welcome to Tofu!Bancho!");
+            } else {
+                this.SendIrcMessage("Failed to join #osu...");
+                this.SendIrcMessage("Welcome to Tofu!Bancho! Chat may not work though given joining failed...");
+            }
         }
         /// <summary>
         /// Used for Notifying the client of something important

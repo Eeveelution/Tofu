@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using Tofu.Bancho.PacketObjects;
 using Tofu.Bancho.Packets;
@@ -38,8 +39,14 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// Current Playmode
         /// </summary>
         public Playmode CurrentPlayMode;
-
+        /// <summary>
+        /// Client Information, such as Version and Timezone, etc.
+        /// </summary>
         public ClientData ClientData;
+        /// <summary>
+        /// The currently Joined channels of this Client
+        /// </summary>
+        protected List<Channel> JoinedChannels;
 
         /// <summary>
         /// Creates a ClientOsu
