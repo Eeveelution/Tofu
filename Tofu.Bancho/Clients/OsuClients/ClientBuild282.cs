@@ -165,6 +165,8 @@ namespace Tofu.Bancho.Clients.OsuClients {
             Logger.Log($"[b282] <{this.Username}@{this.Id}> Killed for: {reason}", LoggerLevelInfo.Instance);
 
             Global.Bancho.ClientManager.RemoveClient(this);
+
+            base.Kill(reason);
         }
 
         /// <summary>

@@ -18,7 +18,7 @@ namespace Tofu.Bancho.Clients {
         /// <summary>
         /// Writer that writes to the Client Stream
         /// </summary>
-        protected BinaryWriter  StreamWriter;
+        protected BinaryWriter StreamWriter;
 
         /// <summary>
         /// Everything known about the User
@@ -32,6 +32,10 @@ namespace Tofu.Bancho.Clients {
         /// Username of the Client
         /// </summary>
         public string Username => User.Username;
+        /// <summary>
+        /// Remote Address of the Client
+        /// </summary>
+        public string Address { get; protected set; }
 
         /// <summary>
         /// Creates a raw client
@@ -41,6 +45,19 @@ namespace Tofu.Bancho.Clients {
             this.TcpClient    = client;
             this.ClientStream = client.GetStream();
             this.StreamWriter = new BinaryWriter(this.ClientStream);
+
+            //Setup client
+            this.TcpClient.NoDelay        = true;
+            this.TcpClient.SendBufferSize = 8192;
+            this.TcpClient.ReceiveTimeout = 0;
+            this.TcpClient.SendTimeout    = 0;
+
+            if (this.TcpClient.LingerState != null) {
+                this.TcpClient.LingerState.Enabled    = true;
+                this.TcpClient.LingerState.LingerTime = 2000;
+            }
+
+            this.Address = this.TcpClient.Client.RemoteEndPoint.ToString().Split(":")[0];
         }
         /// <summary>
         /// Used for Handling everything client related, this gets called by TofuWorkers
@@ -55,7 +72,11 @@ namespace Tofu.Bancho.Clients {
         /// Used for Cleaning up and killing the client
         /// </summary>
         /// <param name="reason">Potential reason for killing this client</param>
-        public abstract void Kill(string reason);
+        public virtual void Kill(string reason) {
+            this.TcpClient.Close();
+            this.ClientStream.Close();
+            this.StreamWriter.Close();
+        }
         /// <summary>
         /// Used for Notifying the client of something important
         /// </summary>
