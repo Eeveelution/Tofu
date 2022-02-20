@@ -8,7 +8,6 @@ using Tofu.Bancho.Packets;
 using Tofu.Bancho.Packets.Build282;
 using Tofu.Bancho.Packets.Build282.Enums;
 using Tofu.Bancho.Packets.Common;
-using Tofu.Common;
 
 namespace Tofu.Bancho.Clients.OsuClients {
     public class ClientBuild282 : ClientOsu {
