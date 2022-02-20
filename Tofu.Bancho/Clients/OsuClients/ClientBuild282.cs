@@ -8,6 +8,7 @@ using Tofu.Bancho.Packets;
 using Tofu.Bancho.Packets.Build282;
 using Tofu.Bancho.Packets.Build282.Enums;
 using Tofu.Bancho.Packets.Common;
+using Tofu.Bancho.Packets.Common.Enums;
 
 namespace Tofu.Bancho.Clients.OsuClients {
     public class ClientBuild282 : ClientOsu {
@@ -20,9 +21,10 @@ namespace Tofu.Bancho.Clients.OsuClients {
         /// </summary>
         /// <param name="clientOsu">UnknownClientOsu to pull data from</param>
         public ClientBuild282(UnknownClientOsu clientOsu) : base(clientOsu.Client) {
-            this.User       = clientOsu.User;
-            this.ClientData = clientOsu.ClientData;
-            this.Presence   = new OsuPresence();
+            this.User            = clientOsu.User;
+            this.ClientData      = clientOsu.ClientData;
+            this.Presence        = new OsuPresence();
+            this.CurrentPlayMode = Playmode.Osu;
         }
         /// <summary>
         /// Handles the client
@@ -185,6 +187,8 @@ namespace Tofu.Bancho.Clients.OsuClients {
             if (osuChannel.Join(this)) {
                 this.SendIrcMessage("Successfully joined #osu!");
                 this.SendIrcMessage("Welcome to Tofu!Bancho!");
+
+                this.JoinedChannels.Add(osuChannel);
             } else {
                 this.SendIrcMessage("Failed to join #osu...");
                 this.SendIrcMessage("Welcome to Tofu!Bancho! Chat may not work though given joining failed...");

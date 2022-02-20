@@ -35,7 +35,7 @@ namespace Tofu.Bancho.Clients {
         /// <summary>
         /// Remote Address of the Client
         /// </summary>
-        public string Address { get; protected set; }
+        public string Address { get; }
 
         /// <summary>
         /// Creates a raw client
